@@ -5,7 +5,7 @@
  */
 'use strict';
 (() => {
-  const APP_VERSION = '3.0.0';
+  const APP_VERSION = '3.1.0';
   const STORE_KEY = 'bhakti.v2';
   const FONT_FAMILY = 'NotoSerifDevaSub';
   const SIZE_MIN = 20, SIZE_MAX = 56, SIZE_DEFAULT = 34;
@@ -371,6 +371,7 @@
     const m = /^v(\d+)$/.exec(aid);
     if (m) { const n = +m[1]; return { anchor: a, n, total, done: n >= total }; }
     if (aid === 'colophon') return { anchor: a, n: total, total, done: true };
+    if (aid === 'refrain') { const t = textCache[id]; const n = (t && t.refrain && t.refrain.after) || 1; return { anchor: a, n, total, done: n >= total }; } // the aarti's refrain follows its stanza
     return { anchor: a, n: 0, total, done: false };
   }
   function resumeTarget() {
@@ -495,7 +496,7 @@
   function renderSlots() {
     const map = { prev: cur - 1, cur, next: cur + 1 };
     for (const [slot, idx] of Object.entries(map)) $(`.page[data-slot="${slot}"]`).innerHTML = (idx >= 0 && idx < pages.length) ? pageHTML(pages[idx]) : '';
-    $('#pageno').textContent = pageLabel(pages[cur]);
+    setPlace(pageLabel(pages[cur]));
     // the cover never overwrites the saved place, so "continue" survives a look at the cover
     const a = anchorOf(cur); if (a && a.id !== 'cover') { st.anchor[text.id] = a; st.recent = text.id; save(); }
     if (controlsOn) prepareShare();
@@ -507,6 +508,7 @@
     if (busy || !pages.length) return;
     const target = cur + dir;
     hideHint();
+    if (controlsOn) setControls(false);
     if (target < 0 || target >= pages.length) {
       snapBack();
       if (!edgeToastShown) { toast(dir > 0 ? 'हे शेवटचे पान आहे' : 'हे पहिले पान (मुखपृष्ठ) आहे'); edgeToastShown = true; }
@@ -517,7 +519,6 @@
       const tr = track(); tr.style.transition = 'none'; tr.style.transform = 'translate3d(0,0,0)';
       busy = false; renderSlots();
     };
-    if (controlsOn) setControls(false);
     $('#coverGo').hidden = true; // it lives outside the sliding pages
     if (!motionOn()) { done(); return; }
     busy = true;
@@ -571,9 +572,17 @@
     };
     vp.addEventListener('pointerup', (e) => finish(e, false));
     vp.addEventListener('pointercancel', (e) => finish(e, true));
-    $('#zPrev').addEventListener('click', () => { if (suppressClick) return; if (controlsOn) { setControls(false); return; } turn(-1); });
-    $('#zNext').addEventListener('click', () => { if (suppressClick) return; if (controlsOn) { setControls(false); return; } turn(1); });
+    // A side tap always turns the page, also while the bar or the first-time hint is showing
+    // (turn() hides both). Only the middle shows or hides the bar.
+    $('#zPrev').addEventListener('click', () => { if (!suppressClick) turn(-1); });
+    $('#zNext').addEventListener('click', () => { if (!suppressClick) turn(1); });
     $('#zMid').addEventListener('click', () => { if (suppressClick) return; hideHint(); setControls(!controlsOn); });
+    // The first-time hint covers the page: a tap on its left or right third does what the page would do.
+    $('#hint').addEventListener('click', (e) => {
+      const x = e.clientX / Math.max(1, window.innerWidth);
+      hideHint();
+      if (x < 1 / 3) turn(-1); else if (x > 2 / 3) turn(1); else setControls(false);
+    });
     $('#coverGo').addEventListener('click', () => {
       if (suppressClick) return;
       hideHint(); if (controlsOn) setControls(false);
@@ -598,7 +607,7 @@
           if (!e.isIntersecting) continue;
           const b = blocks.find((x) => x.id === e.target.dataset.id); if (!b) continue;
           if (b.kind !== 'title' && b.kind !== 'cover') { st.anchor[text.id] = { id: b.id, f: 0 }; st.recent = text.id; save(); }
-          $('#pageno').textContent = b.kind === 'cover' ? '' : b.kind === 'verse' ? `${dn(b.n)} / ${dn(text.verses.length)}` : (b.label || text.short);
+          setPlace(b.kind === 'cover' ? '' : b.kind === 'verse' && b.n ? `${dn(b.n)} / ${dn(text.verses.length)}` : (b.label || text.short));
         }
       }, { root: sc, rootMargin: '-28% 0px -66% 0px', threshold: 0 });
       $$('.blk, .pbody.cover', sc).forEach((el2) => io.observe(el2));
@@ -664,11 +673,24 @@
   /* ------------------------------------------------------------ controls */
   let controlsOn = false;
   function setControls(on) {
-    controlsOn = !!on && !reciting;
+    controlsOn = !!on && !reciting && !!text;
     document.body.classList.toggle('controls', controlsOn);
     $('#zMid').setAttribute('aria-expanded', String(controlsOn));
-    for (const id of ['topbar', 'bottombar']) { const el = $('#' + id); el.inert = !controlsOn; el.setAttribute('aria-hidden', String(!controlsOn)); }
+    const rail = $('#rail'); rail.inert = !controlsOn; rail.setAttribute('aria-hidden', String(!controlsOn));
     if (controlsOn) prepareShare();
+  }
+  /** The place in the text: the folio in the bottom margin, and the second line of the bar's first button.
+   *  The folio and the bar share the bottom margin and are never shown together, so neither covers the text. */
+  function setPlace(label) {
+    $('#pageno').textContent = label || '';
+    $('#locPos').textContent = label || '';
+    $('#locPos').hidden = !label;
+  }
+  function setLocName() {
+    const name = text ? text.short : '';
+    $('#locName').textContent = name; $('#locName').setAttribute('lang', text ? text.lang : 'mr');
+    $('#libBackName').textContent = name; $('#libBackName').setAttribute('lang', text ? text.lang : 'mr');
+    $('#libBack').hidden = !text; $('#library .view-foot').hidden = !text; // first visit: nothing to go back to yet
   }
   function showHint() { if (st.mode === 'page') { $('#hint').hidden = false; setControls(true); } }
   function hideHint() { if (!$('#hint').hidden) { $('#hint').hidden = true; st.hintSeen = true; save(); } }
@@ -685,7 +707,11 @@
     const al = `जप मोजा: ${dn(st.target)} पैकी ${dn(c)} पूर्ण`;
     $('#countBtn').setAttribute('aria-label', al); $('#countBtn2').setAttribute('aria-label', al);
     $('#targetVal').textContent = dn(st.target);
+    $$('[data-target]').forEach((el) => el.setAttribute('aria-pressed', String(+el.dataset.target === st.target)));
     $('#countNow').textContent = text ? `${text.short}: आतापर्यंत ${dn(c)} वेळा पूर्ण` : '';
+    $('#countNow').setAttribute('lang', 'mr');
+    $('#countSec').hidden = !text;
+    if (!resetArm) $('#countReset').textContent = resetLabel();
   }
   function bump() {
     if (!text) return;
@@ -769,13 +795,20 @@
     return new File([blob], `${text.id}-${b.n || b.id}.png`, { type: 'image/png' });
   }
 
-  /* --------------------------------------------------------- drawer/sheets */
-  let lastFocus = null;
-  const overlayOpen = () => !$('#drawer').hidden || !$('#settings').hidden || !$('#about').hidden;
-  /* Android Back closes the open menu or sheet instead of leaving the app. */
+  /* ------------------------------------------- contents page, its pages, the sheet */
+  // The contents page (#library) and its three pages (#japa, #remind, #about) fill the screen; a page
+  // covers the contents page completely, so nothing is ever stacked half-visibly. The one sheet (#look,
+  // letters and colour) is opened only from the reading bar and never opens anything else.
+  const VIEWS = ['library', 'japa', 'remind', 'about'];
+  const OVERLAYS = VIEWS.concat('look');
+  const isOpen = (id) => { const el = $('#' + id); return !!el && !el.hidden; };
+  const overlayOpen = () => OVERLAYS.some(isOpen);
+  const topOverlay = () => ['look', 'about', 'remind', 'japa', 'library'].find(isOpen) || null;
+  const opener = {};
+  /* Android Back closes the open page or sheet instead of leaving the app. */
   const ovStack = []; let ignorePop = 0;
   function pushOverlay(id) { try { history.pushState({ ov: id }, ''); ovStack.push(id); } catch (e) { /* history unavailable */ } }
-  function dropOverlay(id) { // the overlay was closed by a button, scrim or Escape: remove its history entry
+  function dropOverlay(id) { // closed by a button, the backdrop or Escape: remove its history entry
     const i = ovStack.lastIndexOf(id); if (i < 0) return;
     ovStack.splice(i, 1); ignorePop++;
     try { history.back(); } catch (e) { ignorePop--; }
@@ -783,103 +816,44 @@
   window.addEventListener('popstate', () => {
     if (ignorePop > 0) { ignorePop--; return; }
     const id = ovStack.pop(); if (!id) return;
-    if (id === 'drawer') closeDrawer(true); else closeSheet(id, true);
+    closeOverlay(id, true);
   });
-
-  function openDrawer() {
-    if (!$('#drawer').hidden) return;
-    lastFocus = document.activeElement;
-    renderDrawer();
-    const d = $('#drawer'), s = $('#scrim');
-    d.hidden = false; s.hidden = false; $('#dscroll').scrollTop = 0;
-    requestAnimationFrame(() => { d.classList.add('open'); s.classList.add('show'); });
-    $('#menuBtn').setAttribute('aria-expanded', 'true');
-    pushOverlay('drawer');
-    setTimeout(() => $('#drawerTitle').focus(), motionOn() ? 60 : 0);
+  /** Only the top overlay can be reached; the reader and the bar wait underneath. */
+  function syncInert() {
+    const top = topOverlay();
+    $('#app').inert = !!top;
+    for (const id of OVERLAYS) $('#' + id).inert = isOpen(id) && id !== top;
   }
-  function closeDrawer(viaBack) {
-    const d = $('#drawer'), s = $('#scrim');
-    if (d.hidden) return;
-    if (!viaBack) dropOverlay('drawer');
-    d.classList.remove('open'); s.classList.remove('show');
-    $('#menuBtn').setAttribute('aria-expanded', 'false');
-    setTimeout(() => { d.hidden = true; s.hidden = true; }, motionOn() ? 240 : 0);
-    restoreFocus();
-    if (!text && catalog && catalog.texts.length) openText(catalog.texts[0].id);
-  }
-  function restoreFocus() { const f = lastFocus; lastFocus = null; if (f && document.contains(f) && !f.closest('[inert]')) f.focus(); else $('#zMid').focus(); }
-  const langName = (id) => (catalog.languages.find((l) => l.id === id) || { name: id }).name;
-  const setBars = (root) => $$('.bar i[data-pct]', root).forEach((i) => { i.style.width = i.dataset.pct + '%'; }); // CSP: no inline style attributes
-  function progressHTML(t, p) {
-    if (!p) return '';
-    if (p.done) return '<span class="prog">पूर्ण वाचले ✓</span>';
-    const pct = Math.max(3, Math.round((p.n / Math.max(1, p.total)) * 100));
-    const words = p.n ? `${dn(p.total)} पैकी ${dn(p.n)} वाचले` : 'सुरुवात केली';
-    return `<span class="prog"><span class="bar" aria-hidden="true"><i data-pct="${pct}"></i></span><span>${words}</span></span>`;
-  }
-  function itemHTML(t, o) {
-    const now = text && t.id === text.id;
-    const p = progressOf(t.id, t.verses);
-    const kindTag = o && o.kindTag ? `<span class="kind">${kindOf(t) === 'aarti' ? 'आरती' : 'स्तोत्र'}</span>` : '';
-    const parts = [langName(t.lang), `${dn(t.verses)} ${unit(t, 'many')}`];
-    if (o && o.author && t.author) parts.push(t.author);
-    const line1 = t.subtitle ? `<span class="s">${esc(t.subtitle)}</span>` : '';
-    return `<button type="button" class="ditem" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
-      + `<span class="t" lang="${esc(t.lang)}">${esc(t.title)}</span>${line1}`
-      + `<span class="s">${kindTag}${esc(parts.join(' · '))}${now ? ' · <span class="now">आता उघडे आहे</span>' : ''}</span>`
-      + progressHTML(t, p) + '</button>';
-  }
-  function renderContinue() {
-    const box = $('#dcont');
-    const t = st.recent && catalog.texts.find((x) => x.id === st.recent);
-    const p = t && progressOf(t.id, t.verses);
-    if (!t || !p || p.done) { box.innerHTML = ''; return; }
-    const where = p.n ? `${unit(t)} ${dn(p.n)} पासून पुढे` : 'जिथे थांबलात तिथून पुढे';
-    box.innerHTML = `<button type="button" class="dcont" id="contBtn" data-id="${esc(t.id)}">`
-      + '<span class="k">पुढे वाचा</span>'
-      + `<span class="t" lang="${esc(t.lang)}">${esc(t.title)}</span>`
-      + `<span class="s">${esc(where)}</span>${progressHTML(t, p)}</button>`;
-    setBars(box);
-  }
-  function renderDrawer() {
-    const view = st.browse;
-    $('#browseGroup').setAttribute('aria-pressed', String(view === 'group'));
-    $('#browseLang').setAttribute('aria-pressed', String(view === 'lang'));
-    renderContinue();
-    const sec = (title, inner) => (inner ? `<section class="dsec"><h3>${esc(title)}</h3>${inner}</section>` : '');
-    const grp = (g, items, o) => (items.length ? `<div class="dgroup"><h4>${esc(g.name)}</h4>${items.map((t) => itemHTML(t, o)).join('')}</div>` : '');
-    let html = '';
-    if (view === 'group') {
-      const inGroup = (g) => catalog.texts.filter((t) => (t.groups || []).includes(g.id));
-      const deities = catalog.groups.filter((g) => g.kind === 'deity'), saints = catalog.groups.filter((g) => g.kind === 'saint');
-      html += sec('स्तोत्रे', deities.map((g) => grp(g, inGroup(g).filter((t) => kindOf(t) === 'stotra'))).join(''));
-      // aartis: their own group, in catalog order; each item names its deity in its title
-      html += sec('आरत्या', catalog.texts.filter((t) => kindOf(t) === 'aarti').map((t) => itemHTML(t, { author: true })).join(''));
-      html += sec('संतांच्या रचना', saints.map((g) => grp(g, inGroup(g))).join(''));
-    } else {
-      html = catalog.languages.map((l) => sec(l.name, catalog.texts.filter((t) => t.lang === l.id).map((t) => itemHTML(t, { kindTag: true, author: true })).join(''))).join('');
-    }
-    $('#dlist').innerHTML = html;
-    setBars($('#dlist'));
-  }
-  function openSheet(id) {
-    lastFocus = lastFocus || document.activeElement;
-    const s = $('#' + id); if (!s.hidden) return;
-    s.hidden = false;
-    if (id === 'settings') syncSettings();
+  function openOverlay(id) {
+    if (isOpen(id) || !catalog) return;
+    opener[id] = document.activeElement;
+    if (id === 'library') { setControls(false); renderLibrary(); }
+    if (id === 'look') syncLook();
+    if (id === 'japa') { resetArm = false; updateCount(); }
+    if (id === 'remind') { $('#gcalRR').href = gcalUrl('rr'); $('#gcalBH').href = gcalUrl('bh'); }
     if (id === 'about') renderCredits();
+    const el = $('#' + id);
+    el.hidden = false;
+    const body = $('.view-body', el); if (body) body.scrollTop = 0;
+    el.classList.remove('open'); void el.offsetWidth; el.classList.add('open'); // a short rise; none with reduced motion
     pushOverlay(id);
-    setTimeout(() => { const f = $('.sheet-head button', s); if (f) f.focus(); }, 0);
+    syncInert();
+    const h = $('h1, h2', el); if (h) h.focus();
   }
-  function closeSheet(id, viaBack) { const s = $('#' + id); if (s.hidden) return; if (!viaBack) dropOverlay(id); s.hidden = true; restoreFocus(); }
-  function closeTopOverlay() {
-    if (!$('#about').hidden) closeSheet('about');
-    else if (!$('#settings').hidden) closeSheet('settings');
-    else if (!$('#drawer').hidden) closeDrawer();
+  function closeOverlay(id, viaBack) {
+    const el = $('#' + id); if (!el || el.hidden) return;
+    if (!viaBack) dropOverlay(id);
+    el.hidden = true; el.classList.remove('open');
+    syncInert();
+    const f = opener[id]; opener[id] = null;
+    if (f && document.contains(f) && !f.closest('[inert], [hidden]') && f.offsetParent !== null) f.focus();
+    else if (!overlayOpen()) $('#zMid').focus();
+    if (id === 'library' && !text && catalog && catalog.texts.length) openText(catalog.texts[0].id, { cover: true });
   }
+  const closeTopOverlay = () => { const t = topOverlay(); if (t) closeOverlay(t); };
   function trapFocus(e) {
-    const box = !$('#about').hidden ? $('#about') : !$('#settings').hidden ? $('#settings') : !$('#drawer').hidden ? $('#drawer') : null;
-    if (!box) return;
+    const top = topOverlay(); if (!top) return;
+    const box = $('#' + top);
     const f = $$('button, a[href], input, summary, [tabindex]:not([tabindex="-1"])', box).filter((el) => !el.disabled && el.offsetParent !== null);
     if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
@@ -887,35 +861,93 @@
     else if (!e.shiftKey && (document.activeElement === last || !box.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
   }
 
-  /* -------------------------------------------------------------- settings */
-  function setPreviewSize(v) {
-    $('#preview').style.setProperty('--pfs', v + 'px');
-    $('#sizeVal').textContent = dn(v);
-    $('#sizeRange').value = String(v);
-    $('#sizeRange').setAttribute('aria-valuetext', dn(v));
+  /* contents page: one list per kind (स्तोत्रे, then आरत्या once one is live). Each row: the deity's
+     emblem, the title, one quiet line (subtitle · author · language) and a progress ring. */
+  const KIND_HEAD = { stotra: 'स्तोत्रे', aarti: 'आरत्या' };
+  const GROUP_AT = 8; // from this many texts in one list, deity headings appear between them
+  const langName = (id) => (catalog.languages.find((l) => l.id === id) || { name: id }).name;
+  function ringSVG(p) {
+    if (!p) return '';
+    const R = 15, C = 2 * Math.PI * R, frac = p.done ? 1 : Math.max(0.05, p.n / Math.max(1, p.total));
+    const mark = p.done ? '<path class="ring-tick" d="M13.5 20.5 18 25l8.5-9"/>' : (p.n ? `<text class="ring-n" x="20" y="20">${dn(p.n)}</text>` : '');
+    return `<svg class="ring" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><circle class="ring-track" cx="20" cy="20" r="${R}"/>`
+      + `<circle class="ring-arc" cx="20" cy="20" r="${R}" stroke-dasharray="${(frac * C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 20 20)"/>${mark}</svg>`;
   }
-  function syncSettings() {
-    setPreviewSize(st.size);
-    const pv = $('#preview');
-    const b = shareBlock();
-    if (b && b.lines && text) { const first = splitLine(b.lines[0]); pv.textContent = (first ? first[0] : b.lines[0]).replace(/-$/, ''); pv.setAttribute('lang', text.lang); }
+  function progressWords(t, p) {
+    if (!p) return '';
+    if (p.done) return 'पूर्ण वाचले';
+    return p.n ? `${unit(t)} ${dn(p.n)} पर्यंत वाचले` : 'सुरुवात केली';
+  }
+  function rowHTML(t) {
+    const now = text && t.id === text.id;
+    const p = progressOf(t.id, t.verses);
+    const g = groupOf(t.deity) || {};
+    const art = (g.cover && coverSVG[g.cover]) || '';
+    const meta = [t.subtitle, t.author, langName(t.lang)].filter(Boolean).join(' · ');
+    const sr = [now ? 'आता उघडे' : '', progressWords(t, p)].filter(Boolean).join(' · ');
+    return `<li><button type="button" class="trow" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
+      + `<span class="mark" aria-hidden="true">${art}</span>`
+      + `<span class="trow-text"><span class="trow-title" lang="${esc(t.lang)}">${esc(t.title)}</span><span class="trow-meta">${esc(meta)}</span></span>`
+      + ringSVG(p) + (sr ? `<span class="sr"> · ${esc(sr)}</span>` : '') + '</button></li>';
+  }
+  function renderLibrary() {
+    const deities = catalog.groups.filter((g) => g.kind === 'deity');
+    const rank = (t) => { const i = deities.findIndex((g) => g.id === t.deity); return i < 0 ? deities.length : i; };
+    let html = '';
+    const kinds = Object.keys(KIND_HEAD).filter((k) => catalog.texts.some((t) => kindOf(t) === k));
+    for (const kind of kinds) {
+      const items = catalog.texts.map((t, i) => ({ t, i })).filter((x) => kindOf(x.t) === kind)
+        .sort((a, b) => rank(a.t) - rank(b.t) || a.i - b.i).map((x) => x.t);
+      if (!items.length) continue;
+      const split = items.length >= GROUP_AT && new Set(items.map((t) => t.deity)).size > 1;
+      let lists = '';
+      if (split) {
+        for (const g of deities) { const sub = items.filter((t) => t.deity === g.id); if (sub.length) lists += `<h3 class="shelf-sub">${esc(g.name)}</h3><ul class="rows">${sub.map(rowHTML).join('')}</ul>`; }
+      } else lists = `<ul class="rows">${items.map(rowHTML).join('')}</ul>`;
+      // a heading only when there is more than one kind (स्तोत्रे and आरत्या): a single list needs none
+      html += kinds.length > 1 ? `<section class="shelf" aria-labelledby="shelf-${kind}"><h2 class="shelf-head" id="shelf-${kind}">${KIND_HEAD[kind]}</h2>${lists}</section>` : `<section class="shelf">${lists}</section>`;
+    }
+    $('#shelf').innerHTML = html;
+  }
+
+  /* -------------------------------------------------- letters and colour (sheet) */
+  function setRange(v) { $('#sizeRange').value = String(v); $('#sizeRange').setAttribute('aria-valuetext', dn(v)); }
+  function syncLook() {
+    setRange(st.size);
     $$('[data-theme-choice]').forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.themeChoice === themeNow())));
     $$('[data-mode-choice]').forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.modeChoice === st.mode)));
     $('#meaningToggle').checked = st.meaning;
-    $('#meaningSec').hidden = !(text && text.verses.some((v) => v.meaning_mr)); // aartis have no meanings yet
+    $('#meaningSec').hidden = !(text && text.verses.some((v) => v.meaning_mr)); // aartis have no meanings
     $('#motionToggle').checked = motionOn();
-    updateCount();
-    $('#gcalRR').href = gcalUrl('rr');
-    $('#gcalBH').href = gcalUrl('bh');
-    resetArm = false; $('#countReset').textContent = resetLabel();
   }
-  function setSize(v) {
+  let sizeTimer = 0;
+  function setSize(v, soon) {
     v = clamp(Math.round(v), SIZE_MIN, SIZE_MAX);
-    setPreviewSize(v);
+    setRange(v);
+    clearTimeout(sizeTimer);
     if (v === st.size) return;
-    st.size = v; save();
-    relayout();
+    const apply = () => { st.size = v; save(); relayout(); };
+    if (soon) sizeTimer = setTimeout(apply, 140); else apply(); // while dragging: the page follows shortly after
   }
+  function bindLook() {
+    const range = $('#sizeRange');
+    range.addEventListener('input', () => setSize(+range.value, true));
+    range.addEventListener('change', () => setSize(+range.value));
+    $('#sizeDown').addEventListener('click', () => setSize(st.size - 2));
+    $('#sizeUp').addEventListener('click', () => setSize(st.size + 2));
+    $$('[data-theme-choice]').forEach((el) => el.addEventListener('click', () => { st.theme = el.dataset.themeChoice; save(); applyTheme(); syncLook(); }));
+    $$('[data-mode-choice]').forEach((el) => el.addEventListener('click', () => {
+      const m = el.dataset.modeChoice; if (m === st.mode) return;
+      const a = st.mode === 'page' && pages.length ? anchorOf(cur) : st.anchor[text && text.id];
+      st.mode = m; save(); syncLook(); relayout(a || null);
+    }));
+    $('#meaningToggle').addEventListener('change', (e) => { st.meaning = e.target.checked; save(); relayout(); });
+    $('#motionToggle').addEventListener('change', (e) => { st.motion = e.target.checked; save(); applyTheme(); });
+    $('#lookClose').addEventListener('click', () => closeOverlay('look'));
+    $('#look').addEventListener('click', (e) => { if (e.target.id === 'look') closeOverlay('look'); }); // the dimmed page above the sheet
+  }
+
+  /* ------------------------------------------------------------- japa, reminders */
   let resetArm = false, resetTimer = 0;
   const resetLabel = () => `${unit(entry, 'gen')} मोजणी शून्य करा`;
   function gcalUrl(kind) {
@@ -933,20 +965,7 @@
     });
     return 'https://calendar.google.com/calendar/render?' + p.toString();
   }
-  function bindSettings() {
-    const range = $('#sizeRange');
-    range.addEventListener('input', () => setPreviewSize(+range.value));
-    range.addEventListener('change', () => setSize(+range.value));
-    $('#sizeDown').addEventListener('click', () => setSize(st.size - 2));
-    $('#sizeUp').addEventListener('click', () => setSize(st.size + 2));
-    $$('[data-theme-choice]').forEach((el) => el.addEventListener('click', () => { st.theme = el.dataset.themeChoice; save(); applyTheme(); syncSettings(); }));
-    $$('[data-mode-choice]').forEach((el) => el.addEventListener('click', () => {
-      const m = el.dataset.modeChoice; if (m === st.mode) return;
-      const a = st.mode === 'page' && pages.length ? anchorOf(cur) : st.anchor[text && text.id];
-      st.mode = m; save(); syncSettings(); relayout(a || null);
-    }));
-    $('#meaningToggle').addEventListener('change', (e) => { st.meaning = e.target.checked; save(); relayout(); });
-    $('#motionToggle').addEventListener('change', (e) => { st.motion = e.target.checked; save(); applyTheme(); });
+  function bindJapa() {
     const setTarget = (v) => { st.target = clamp(Math.round(v), 1, 100000); save(); updateCount(); };
     $('#targetDown').addEventListener('click', () => setTarget(st.target - 1));
     $('#targetUp').addEventListener('click', () => setTarget(st.target + 1));
@@ -954,7 +973,7 @@
     $('#countReset').addEventListener('click', (e) => {
       if (!text) return;
       if (!resetArm) { resetArm = true; e.currentTarget.textContent = 'खरंच शून्य करायची? पुन्हा दाबा'; clearTimeout(resetTimer); resetTimer = setTimeout(() => { resetArm = false; $('#countReset').textContent = resetLabel(); }, 5000); return; }
-      resetArm = false; st.count[text.id] = 0; save(true); updateCount(); $('#countReset').textContent = resetLabel(); toast('मोजणी शून्य केली');
+      resetArm = false; st.count[text.id] = 0; save(true); updateCount(); toast('मोजणी शून्य केली');
     });
   }
 
@@ -975,10 +994,11 @@
         + (t.corrections.length ? `<details><summary>बदलांची यादी</summary><ol>${t.corrections.map((c) => `<li><span class="dev">${esc(c.where)}</span> ${c.kind === 'added' ? '(जोडले)' : ''}: <span class="dev">${esc(c.from)}</span> → <span class="dev">${esc(c.to)}</span></li>`).join('')}</ol></details>` : '');
     }).join('')
       + '<h3>मुखपृष्ठावरील चित्रे</h3><p>धनुष्य-बाण, गदा व इतर चिन्हे या ॲपसाठी नव्याने काढलेली मूळ चित्रे आहेत; देवतांची चित्रे मुद्दाम काढलेली नाहीत. कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
+      + '<h3>बटणांवरील चिन्हे</h3><p>यादी, माळ, घंटा इत्यादी छोटी चिन्हे याच ॲपसाठी साध्या रेषांतून काढलेली मूळ चित्रे आहेत; कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
       + `<h3>मुखपृष्ठावरील नावाची अक्षरे</h3><p>“Gotu” अक्षरशैलीवरून तयार केलेली अक्षरांची रेखाचित्रे — Gotu © 2016 Ek Type, परवाना: ${link('fonts/OFL-Gotu.txt', 'SIL Open Font License 1.1')}. फॉन्टची फाईल ॲपमध्ये नाही; फक्त या नावांची अक्षरे आहेत.</p>`
       + '<h3>मराठी अर्थ</h3><p>अर्थ संगणकाने (AI) लिहिलेला कच्चा <strong>मसुदा</strong> आहे; जाणकारांनी तो अजून तपासलेला नाही, म्हणून तो आपोआप दिसत नाही. यावर कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
       + `<h3>अक्षरशैली (फॉन्ट)</h3><p>Noto Serif Devanagari — © 2022 The Noto Project Authors. परवाना: ${link('fonts/OFL.txt', 'SIL Open Font License 1.1')}. येथे नियमित (Regular) वजनाचा, देवनागरीपुरता लहान केलेला संच (WOFF2).</p>`
-      + '<h3>गोपनीयता</h3><p>खाते नाही, जाहिराती नाहीत, वापराचे मोजमाप (analytics) नाही, ध्वनी नाही. सेटिंग्ज, शेवटचे पान व जप-संख्या फक्त या फोनवर साठवली जाते. “Google Calendar” बटण दाबले तरच Google चे पान उघडते.</p>'
+      + '<h3>गोपनीयता</h3><p>खाते नाही, जाहिराती नाहीत, वापराचे मोजमाप (analytics) नाही, ध्वनी नाही. तुमच्या निवडी, शेवटचे पान व जप-संख्या फक्त या फोनवर साठवल्या जातात. “Google Calendar” बटण दाबले तरच Google चे पान उघडते.</p>'
       + `<h3>इंटरनेटशिवाय वापर</h3><p id="offlineState">${offlineText()}</p>`
       + `<p class="note">आवृत्ती ${esc(APP_VERSION)}</p>`;
   }
@@ -1031,44 +1051,27 @@
     blocks = buildBlocks(t); pages = []; shareCache = null; edgeToastShown = false;
     $('#welcome').hidden = true;
     document.title = `${t.short} · माझी स्तोत्रे`;
-    const bt = $('#barTitle'); bt.textContent = t.title; bt.setAttribute('lang', t.lang);
+    setLocName();
     updateCount();
     // from the list: start at the cover (it offers "continue"); on app start: back to the saved place
     await relayout(opts && opts.cover ? { id: 'cover', f: 0 } : (st.anchor[id] || null));
     if (!st.hintSeen && st.mode === 'page') showHint();
   }
+  /** A row in the contents page: the text you are reading takes you back to your page; another text opens at its cover. */
+  function pick(id) {
+    const same = text && id === text.id;
+    closeOverlay('library');
+    if (!same) openText(id, { cover: true });
+    $('#zMid').focus();
+  }
   function bindUI() {
-    bindGestures(); bindScroller(); bindSettings();
-    $('#hint').addEventListener('click', hideHint);
-    $('#menuBtn').addEventListener('click', openDrawer);
-    $('#barTitle').addEventListener('click', openDrawer);
-    $('#drawerClose').addEventListener('click', closeDrawer);
-    $('#scrim').addEventListener('click', closeDrawer);
-    $('#browseGroup').addEventListener('click', () => { st.browse = 'group'; save(); renderDrawer(); });
-    $('#browseLang').addEventListener('click', () => { st.browse = 'lang'; save(); renderDrawer(); });
-    const pick = (id, how) => {
-      lastFocus = null;
-      dropOverlay('drawer');
-      const d = $('#drawer'), sc = $('#scrim');
-      d.classList.remove('open'); sc.classList.remove('show');
-      setTimeout(() => { d.hidden = true; sc.hidden = true; }, motionOn() ? 240 : 0);
-      $('#menuBtn').setAttribute('aria-expanded', 'false');
-      const same = text && id === text.id;
-      if (how === 'resume') {
-        if (!same) openText(id);
-        else if (st.mode === 'page' && !reciting) { setControls(false); go(pageOfAnchor(st.anchor[id])); }
-        else relayout(st.anchor[id]);
-      } else if (!same) openText(id, { cover: true });
-      else setControls(false);
-      $('#zMid').focus();
-    };
-    $('#dlist').addEventListener('click', (e) => { const b = e.target.closest('.ditem'); if (b) pick(b.dataset.id); });
-    $('#dcont').addEventListener('click', (e) => { const b = e.target.closest('.dcont'); if (b) pick(b.dataset.id, 'resume'); });
-    $('#aboutBtn').addEventListener('click', () => openSheet('about'));
-    $('#settingsBtn').addEventListener('click', () => openSheet('settings'));
-    $('#settingsClose').addEventListener('click', () => closeSheet('settings'));
-    $('#aboutClose').addEventListener('click', () => closeSheet('about'));
-    for (const id of ['settings', 'about']) $('#' + id).addEventListener('click', (e) => { if (e.target.id === id) closeSheet(id); });
+    bindGestures(); bindScroller(); bindLook(); bindJapa();
+    $('#libBtn').addEventListener('click', () => openOverlay('library'));
+    $('#lookBtn').addEventListener('click', () => openOverlay('look'));
+    $('#libBack').addEventListener('click', () => closeOverlay('library'));
+    $('#shelf').addEventListener('click', (e) => { const b = e.target.closest('.trow'); if (b) pick(b.dataset.id); });
+    $$('[data-open]').forEach((b) => b.addEventListener('click', () => openOverlay(b.dataset.open)));
+    $$('[data-back]').forEach((b) => b.addEventListener('click', () => closeOverlay(b.closest('.view').id)));
     $('#reciteBtn').addEventListener('click', startRecite);
     $('#reciteClose').addEventListener('click', stopRecite);
     $('#playBtn').addEventListener('click', () => setPlaying(!playing));
@@ -1122,14 +1125,18 @@
       return;
     }
     bindUI();
-    if (!st.text || !catalog.texts.some((t) => t.id === st.text)) { $('#welcome').hidden = false; openDrawer(); }
+    setLocName();
+    // the contents page shows every text's emblem: fetch the few cover files once (they are precached)
+    Promise.all(catalog.texts.map(loadCoverArt)).then(() => { if (isOpen('library')) renderLibrary(); });
+    if (!st.text || !catalog.texts.some((t) => t.id === st.text)) openOverlay('library'); // first visit: the contents page is the start
     else await openText(st.text);
   }
 
-  // Small read-only hook for the automated tests in tests/ (no network, no side effects).
+  // Small read-only hook for the automated tests (no network, no side effects).
   window.__stotre = {
     version: APP_VERSION, state: () => JSON.parse(JSON.stringify(st)), pages: () => pages.length, cur: () => cur,
     label: () => pageLabel(pages[cur]), go, turn, relayout, setSize, openText, aksharas, splitLine,
+    controls: () => controlsOn, top: () => topOverlay(),
     blockIds: () => blocks.map((b) => b.id),
     pageParts: () => pages.map((p) => p.map((x) => ({ id: blocks[x.i].id, from: x.from, to: x.to, n: rows[x.i].length }))),
     shareCheck: () => {

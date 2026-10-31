@@ -20,6 +20,12 @@ under CC BY-SA 4.0 in the reviewer's name.
 Original drawings made for this app from plain geometry (bow and arrow for Shri Ram; mace before the rising sun for
 Maruti). No image was traced or copied, and no deity figure is drawn. Dedicated to the public domain under CC0 1.0.
 
+## Interface icons (inline SVG symbols in index.html)
+Original drawings made for this app on a 24-unit grid from plain lines and circles (list, mala, bell, info, send,
+recitation, open book, page with arrow, chevrons, close, check, play and pause). No icon font or icon set is used and
+nothing was traced or copied. Dedicated to the public domain under CC0 1.0. The "अ" marks are letters set in the
+bundled Noto Serif Devanagari.
+
 ## Cover title lettering (covers/titles.json)
 Glyph outlines of the cover title lines, made with HarfBuzz from Gotu Regular, © 2016 Ek Type
 (https://github.com/EkType/Gotu), SIL Open Font License 1.1 — licence text in `fonts/OFL-Gotu.txt`.
