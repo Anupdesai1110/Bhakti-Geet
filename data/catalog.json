@@ -1,0 +1,66 @@
+{
+ "schema": 1,
+ "app": {
+  "name": "माझी स्तोत्रे",
+  "short_name": "स्तोत्रे"
+ },
+ "groups": [
+  {
+   "id": "ram",
+   "kind": "deity",
+   "name": "श्रीराम"
+  },
+  {
+   "id": "hanuman",
+   "kind": "deity",
+   "name": "हनुमान (मारुती)"
+  },
+  {
+   "id": "ramdas",
+   "kind": "saint",
+   "name": "समर्थ रामदास"
+  }
+ ],
+ "languages": [
+  {
+   "id": "mr",
+   "name": "मराठी"
+  },
+  {
+   "id": "sa",
+   "name": "संस्कृत"
+  },
+  {
+   "id": "hi",
+   "name": "हिंदी"
+  }
+ ],
+ "texts": [
+  {
+   "id": "ramraksha",
+   "file": "data/ramraksha.json",
+   "title": "श्रीरामरक्षास्तोत्रम्",
+   "short": "रामरक्षा",
+   "lang": "sa",
+   "groups": [
+    "ram"
+   ],
+   "author": "बुधकौशिक ऋषी",
+   "verses": 38
+  },
+  {
+   "id": "bhimrupi",
+   "file": "data/bhimrupi.json",
+   "title": "भीमरूपी स्तोत्र",
+   "subtitle": "मारुती स्तोत्र",
+   "short": "भीमरूपी",
+   "lang": "mr",
+   "groups": [
+    "hanuman",
+    "ramdas"
+   ],
+   "author": "समर्थ रामदास",
+   "verses": 17
+  }
+ ]
+}

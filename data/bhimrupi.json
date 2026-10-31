@@ -1,0 +1,447 @@
+{
+ "schema": 2,
+ "id": "bhimrupi",
+ "title": "भीमरूपी स्तोत्र",
+ "subtitle": "मारुती स्तोत्र",
+ "short": "भीमरूपी",
+ "lang": "mr",
+ "author": "समर्थ रामदास",
+ "meter": "अनुष्टुप्",
+ "source": {
+  "site": "mr.wikisource.org",
+  "page": "चतुर्दश मारूती स्तोत्रे — स्तोत्र १",
+  "rev_id": 156943,
+  "url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+  "credit": "विकिस्रोत योगदानकर्ते (Wikisource contributors)",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+ },
+ "licenses": {
+  "text": "CC BY-SA 4.0 — विकिस्रोतावरील पाठ, या प्रकल्पाच्या दुरुस्त्यांसह (share-alike)",
+  "meanings": "CC0 1.0 — AI ने तयार केलेला अर्थ-मसुदा; कॉपीराइट दावा नाही; मानवी तपासणी बाकी"
+ },
+ "meaning_note": "मसुदा",
+ "front": [],
+ "verses": [
+  {
+   "text_id": "bhimrupi",
+   "n": 1,
+   "devanagari": "भीमरूपी महारुद्रा वज्रहनुमान मारुती ।\nवनारी अंजनीसूता रामदूता प्रभंजना ॥१॥",
+   "meaning_mr": "भयंकर रूपाचे, महारुद्र, वज्रासारखे हनुमान मारुती, वनाचे शत्रू (लंकेतील रावणाचे वन उद्ध्वस्त करणारे), अंजनीपुत्र, रामदूत, प्रभंजन (वायुपुत्र)!",
+   "meaning_status": "draft",
+   "meaning_review": "edited-v2 (वनारी: santsahitya.in, marathisrushti.com)",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "वनारि",
+     "sources": [
+      "TL"
+     ],
+     "note": "\"वानरी\" कोणत्याही स्रोतात आढळले नाही"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 2,
+   "devanagari": "महाबली प्राणदाता सकळां ऊठवी बळें ।\nसौख्यकारी शोकहर्ता धूर्त वैष्णव गायका ॥२॥",
+   "meaning_mr": "महाबलवान, प्राण देणारे, सर्वांना बळाने उठवणारे, सुख देणारे, शोक हरणारे, चतुर, वैष्णव आणि (रामाचे) गायक!",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "दूत वैष्णव गायका",
+     "sources": [
+      "SS"
+     ],
+     "note": "आमचा पाठ \"धूर्त\" (विकिस्रोत, WD, TL)"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 3,
+   "devanagari": "दिनानाथा हरिरूपा सुंदरा जगदंतरा ।\nपातालदेवता हंता भव्यशेंदूरलेपना ॥३॥",
+   "meaning_mr": "दीनांचे नाथ, हरिरूप, सुंदर, जगाच्या अंतर्यामी, पाताळातील देवतांचा नाश करणारे, शेंदूर लावलेले तेजस्वी!",
+   "meaning_status": "draft",
+   "meaning_review": "doubtful: पातालदेवता हंता",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "दीनानाथा",
+     "sources": [
+      "RW"
+     ],
+     "note": "आमचा पाठ \"दिनानाथा\" (विकिस्रोत, WD, TL)"
+    },
+    {
+     "reading": "भव्य सिंदूर लेपना",
+     "sources": [
+      "WD",
+      "RW"
+     ],
+     "note": "शेंदूर हे मराठी रूप ठेवले"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 4,
+   "devanagari": "लोकनाथा जगन्नाथा प्राणनाथा पुरातना ।\nपुण्यवंता पुण्यशीला पावना परतोषका ॥४॥",
+   "meaning_mr": "लोकनाथ, जगन्नाथ, प्राणनाथ, पुरातन, पुण्यवान, पुण्यशील, पवित्र आणि (भक्तांना) संतोष देणारे!",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 5,
+   "devanagari": "ध्वजांगें ऊचली बाहो आवेशें लोटला पुढें ।\nकाळाग्नी काळरुद्राग्नी देखतां कांपती भयें ॥५॥",
+   "meaning_mr": "ध्वजासारखा बाहू उंचावून आवेशाने पुढे झेपावले असता, काळाग्नी आणि काळरुद्राग्नीसुद्धा पाहून भयाने कापतात.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "ध्वजांगे उचली बाहू",
+     "sources": [
+      "WD"
+     ],
+     "note": "बाहो (विकिस्रोत, RW, HP) ठेवले"
+    },
+    {
+     "reading": "आवेशें लोटिला पुढें",
+     "sources": [
+      "WD"
+     ],
+     "note": "लोटला (बहुमत) ठेवले"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 6,
+   "devanagari": "ब्रह्मांडें माइली नेणों आवळे दंतपंगती ।\nनेत्राग्नी चालिल्या ज्वाळा भ्रुकुटी ताठिल्या बळें ॥६॥",
+   "meaning_mr": "ब्रह्मांडात न मावणारे, दातांच्या रांगा आवळलेले, डोळ्यांतून ज्वाळा निघणारे, भुवया बळाने ताणलेले —",
+   "meaning_status": "draft",
+   "meaning_review": "doubtful: ब्रह्मांडें माइली नेणों",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "ब्रह्मांडें माइलें नेणों",
+     "sources": [
+      "RW",
+      "HP"
+     ],
+     "note": ""
+    },
+    {
+     "reading": "भृकुटी त्राहिटिल्या बळें",
+     "sources": [
+      "WD"
+     ],
+     "note": "ताठिल्या (बहुमत) ठेवले"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 7,
+   "devanagari": "पुच्छ तें मुर्डिलें माथां किरीटी कुंडलें वरी ।\nसुवर्णकटिं कासोटी घंटा किंकिणि नागरा ॥७॥",
+   "meaning_mr": "शेपूट मस्तकावर वळवलेली, डोक्यावर मुकुट, कानात कुंडले, कमरेला सुवर्णाची कासोटी, घंटा व किंकिणी (लहान घुंगुर) शोभतात —",
+   "meaning_status": "draft",
+   "meaning_review": "doubtful: नागरा (सुंदर? नगारा?)",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "किरीटी कुंडलें बरीं",
+     "sources": [
+      "WD",
+      "SW"
+     ],
+     "note": "आमचा पाठ \"वरी\" (विकिस्रोत, TL)"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 8,
+   "devanagari": "ठकारे पर्वताऐसा नेटका सडपातळू ।\nचपलांग पाहतां मोठें महाविद्युल्लतेपरी ॥८॥",
+   "meaning_mr": "पर्वतासारखे भव्य तरी नेटके व सडपातळ, चपळ अंग; पाहता मोठ्या विजेच्या लोळासारखे —",
+   "meaning_status": "draft",
+   "meaning_review": "incomplete: ठकारे",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 9,
+   "devanagari": "कोटिच्या कोटि उड्डाणें झेंपावे उत्तरेकडे ।\nमंदाद्रिसारिखा द्रोणू क्रोधें उत्पाटिला बळें ॥९॥",
+   "meaning_mr": "कोट्यवधी उड्डाणे घेत उत्तरेकडे झेपावले आणि मंदार पर्वतासारखा द्रोणागिरी रागाने बळाने उपटून आणला.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 10,
+   "devanagari": "आणिला मागुती नेला आला गेला मनोगती ।\nमनासी टाकिलें मागें गतीसी तुळना नसे ॥१०॥",
+   "meaning_mr": "तो आणला, परत नेऊन ठेवला, मनाच्या वेगाने येणे-जाणे केले; मनालाही मागे टाकले — त्यांच्या गतीला तुलना नाही.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "आणिता मागुता नेला",
+     "sources": [
+      "WD"
+     ],
+     "note": "आमचा पाठ \"आणिला मागुती\" (RW, SW)"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 11,
+   "devanagari": "अणूपासूनि ब्रह्मांडाएवढा होत जातसे ।\nतयासी तुळणा कोठें मेरू मंदार धाकुटे ॥११॥",
+   "meaning_mr": "अणूपासून ब्रह्मांडाएवढे वाढत जातात; त्यांना तुलना कुठे? मेरू आणि मंदार पर्वतही त्यांच्यापुढे लहान.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 12,
+   "devanagari": "ब्रह्मांडाभोंवते वेढे स्वपुच्छें घालवूं शके ।\nतयासी तुळणा कैची ब्रह्मांडीं पाहतां नसे ॥१२॥",
+   "meaning_mr": "स्वतःच्या शेपटीने ब्रह्मांडाभोवती वेढे घालू शकतात; ब्रह्मांडात पाहिले तरी त्यांना तुलना नाही.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "वज्रपुच्छें करूं शके",
+     "sources": [
+      "SW",
+      "RW"
+     ],
+     "note": "विकिस्रोताचा \"स्वपुच्छें घालवूं\" अन्य कोणत्याही स्रोतात आढळला नाही — तपासणी आवश्यक"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 13,
+   "devanagari": "आरक्त देखिलें डोळां गिळिलें सूर्यमंडळा ।\nवाढतां वाढतां वाढे भेदिलें शून्यमंडळा ॥१३॥",
+   "meaning_mr": "डोळ्यांनी लालबुंद सूर्य पाहिला आणि सूर्यमंडळ गिळले; वाढता वाढता शून्यमंडळ (आकाश) भेदून गेले.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": [
+    {
+     "reading": "ग्रासिलें सूर्यमंडळा",
+     "sources": [
+      "SW"
+     ],
+     "note": "आमचा पाठ \"गिळिलें\" (WD)"
+    }
+   ]
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 14,
+   "devanagari": "धनधान्य पशुवृद्धी पुत्रपौत्र समग्रही ।\nपावती रूपविद्यादी स्तोत्रपाठें करूनियां ॥१४॥",
+   "meaning_mr": "हे स्तोत्र पठण केल्याने धन-धान्य, पशुधनाची वाढ, पुत्र-पौत्र, रूप, विद्या इत्यादी सर्व काही प्राप्त होते.",
+   "meaning_status": "draft",
+   "meaning_review": "new-v2",
+   "source_url": "see corrections ॥१४॥",
+   "rev_id": null,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 15,
+   "devanagari": "भूत प्रेत समंधादी रोगव्याधी समस्तही ।\nनासती तूटती चिंता आनंदें भीमदर्शनें ॥१५॥",
+   "meaning_mr": "भूत, प्रेत, समंध इत्यादी आणि सर्व रोग-व्याधी नष्ट होतात; भीमरूपी मारुतीच्या दर्शनाने चिंता तुटून आनंद मिळतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 16,
+   "devanagari": "हे धरा पंधरा श्लोकीं लाभली शोभली भली ।\nदृढदेहो निसंदेहो संख्या चंद्रकळा गुणें ॥१६॥",
+   "meaning_mr": "ही पंधरा श्लोकांची स्तुती लाभदायक व सुंदर आहे; (पठणाने) शरीर दृढ आणि मन निःसंदेह होते; (पठणाची) संख्या चंद्रकलांच्या पटीत करावी.",
+   "meaning_status": "draft",
+   "meaning_review": "doubtful: हे धरा; संख्या चंद्रकळा गुणें",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  },
+  {
+   "text_id": "bhimrupi",
+   "n": 17,
+   "devanagari": "रामदासीं अग्रगण्यू कपिकुळासि मंडणू ।\nरामरूपीं अंतरात्मा दर्शनें दोष नासती ॥१७॥",
+   "meaning_mr": "रामदासांत अग्रगण्य, वानरकुळाचे भूषण, रामरूपी अंतरात्मा — त्यांच्या दर्शनाने दोष नष्ट होतात.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://mr.wikisource.org/w/index.php?oldid=156943",
+   "rev_id": 156943,
+   "variants": []
+  }
+ ],
+ "back": [
+  {
+   "id": "colophon",
+   "label": "समाप्ती",
+   "kind": "prose",
+   "devanagari": "॥ इति श्रीरामदासकृतं संकटनिरसनं मारुतिस्तोत्रं संपूर्णम् ॥",
+   "status": "one source"
+  }
+ ],
+ "corrections": [
+  {
+   "where": "॥३॥",
+   "from": "संदरा",
+   "to": "सुंदरा",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "WD",
+    "RW"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥५॥",
+   "from": "ध्वजांगेंऊचली",
+   "to": "ध्वजांगें ऊचली",
+   "kind": "spacing",
+   "basis": "दोन शब्द; विकिस्रोताचे ऊ-लेखन ठेवले (बहुतेक प्रतींत \"उचली\")",
+   "sources": [
+    "WD",
+    "RW",
+    "HP"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥१४॥",
+   "from": "(श्लोक नाही)",
+   "to": "धनधान्य पशुवृद्धी पुत्रपौत्र समग्रही । पावती रूपविद्यादी स्तोत्रपाठें करूनियां",
+   "kind": "added",
+   "basis": "विकिस्रोताखेरीज तपासलेल्या सर्व पूर्ण पाठांत हा श्लोक ॥१४॥ म्हणून आहे; पुढील श्लोक १५–१७ असे क्रमांक बदलले",
+   "sources": [
+    "WD",
+    "SW",
+    "RW",
+    "CIF",
+    "BM",
+    "AS",
+    "HP"
+   ],
+   "status": "verified (7 sources; no critical edition seen)",
+   "release": "v2"
+  },
+  {
+   "where": "॥१६॥",
+   "from": "दृढ देहोनिसंदेहो",
+   "to": "दृढदेहो निसंदेहो",
+   "kind": "spacing",
+   "basis": "शब्द-विभागणी",
+   "sources": [
+    "WD",
+    "SW"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥१७॥",
+   "from": "राम दासीं अग्रगणू",
+   "to": "रामदासीं अग्रगण्यू",
+   "kind": "spacing",
+   "basis": "\"राम दासीं\" अशी फोड अर्थ बदलते; \"अग्रगण्यू\" हा रूढ शब्द",
+   "sources": [
+    "SW",
+    "WD"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "समाप्ती",
+   "from": "(नाही)",
+   "to": "॥ इति श्रीरामदासकृतं संकटनिरसनं मारुतिस्तोत्रं संपूर्णम् ॥",
+   "kind": "added",
+   "basis": "पोथीतील समाप्ती-वाक्य; एकाच स्रोतात सापडले — तपासणीसाठी चिन्हांकित",
+   "sources": [
+    "WD"
+   ],
+   "status": "one source — reviewer to confirm",
+   "release": "v2"
+  }
+ ],
+ "sources": {
+  "MRWS-BH": {
+   "name": "मराठी विकिस्रोत: चतुर्दश मारूती स्तोत्रे, स्तोत्र १ (आवृत्ती 156943, मूळ आधार)",
+   "url": "https://mr.wikisource.org/w/index.php?oldid=156943"
+  },
+  "WD": {
+   "name": "Webdunia Hindi – समर्थ रामदास कृत मारुती स्तोत्र",
+   "url": "https://hindi.webdunia.com/aarti-chalisa/guru-samarth-ramdas-krut-maruti-stotra-124042300016_1.html"
+  },
+  "SW": {
+   "name": "stotras.wordpress.com – Bhimrupi stotra (snippet)",
+   "url": "https://stotras.wordpress.com/2013/03/03/bhimrupi-stotra/"
+  },
+  "RW": {
+   "name": "ravalwebs – maruti-stotra.pdf (snippet)",
+   "url": "https://ravalwebs.github.io/hanumanchalisa/pdf/maruti-stotra.pdf"
+  },
+  "CIF": {
+   "name": "Chinmaya International Foundation – Maruti Stotra (snippet)",
+   "url": "https://chinfo.org/maruti-stotra-bhimrupi-maharudra/"
+  },
+  "TL": {
+   "name": "TransLiteral (snippet)",
+   "url": "https://www.transliteral.org/pages/z140331045041/view"
+  },
+  "SS": {
+   "name": "santsahitya.in – भीमरूपी स्तोत्रे (snippet)",
+   "url": "https://www.santsahitya.in/sant-samarth-ramdash/bhimrupi-stotre/"
+  },
+  "HP": {
+   "name": "hindipath.com – भीमरूपी महारुद्रा",
+   "url": "https://hindipath.com/bhimrupi-maharudra/"
+  },
+  "BM": {
+   "name": "bolimarathi.com – मारुती स्तोत्र",
+   "url": "https://bolimarathi.com/maruti-stotra-in-marathi/"
+  },
+  "AS": {
+   "name": "AstroSage – Maruti stotra",
+   "url": "https://www.astrosage.com/dharma-karma/maruti-stotra.asp"
+  }
+ }
+}

@@ -1,0 +1,986 @@
+{
+ "schema": 2,
+ "id": "ramraksha",
+ "title": "श्रीरामरक्षास्तोत्रम्",
+ "short": "रामरक्षा",
+ "lang": "sa",
+ "author": "बुधकौशिक ऋषी",
+ "source": {
+  "site": "sa.wikisource.org",
+  "page": "रामरक्षास्तोत्रम्",
+  "rev_id": 403980,
+  "url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+  "credit": "विकिस्रोत योगदानकर्ते (Wikisource contributors)",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+ },
+ "licenses": {
+  "text": "CC BY-SA 4.0 — विकिस्रोतावरील पाठ, या प्रकल्पाच्या दुरुस्त्यांसह (share-alike)",
+  "meanings": "CC0 1.0 — AI ने तयार केलेला अर्थ-मसुदा; कॉपीराइट दावा नाही; मानवी तपासणी बाकी"
+ },
+ "meaning_note": "मसुदा",
+ "front": [
+  {
+   "id": "viniyoga",
+   "label": "विनियोग",
+   "kind": "prose",
+   "devanagari": "ॐ श्रीगणेशाय नमः ।\nअस्य श्रीरामरक्षास्तोत्रमन्त्रस्य । बुधकौशिकऋषिः ।\nश्रीसीतारामचन्द्रो देवता । अनुष्टुप् छन्दः । सीता शक्तिः ।\nश्रीमद्धनुमान् कीलकम् । श्रीरामचन्द्रप्रीत्यर्थे जपे विनियोगः ।",
+   "variants": [
+    {
+     "reading": "श्रीरामचन्द्रप्रीत्यर्थे रामरक्षास्तोत्रजपे विनियोगः",
+     "sources": [
+      "SD",
+      "PUS",
+      "AMB"
+     ],
+     "note": "विकिस्रोतात \"…प्रीत्यर्थे जपे विनियोगः\"; दोन्ही रूढ"
+    }
+   ]
+  },
+  {
+   "id": "dhyana",
+   "label": "ध्यान",
+   "kind": "verse",
+   "devanagari": "अथ ध्यानम् ।\nध्यायेदाजानुबाहुं धृतशरधनुषं बद्धपद्मासनस्थं ।\nपीतं वासो वसानं नवकमलदलस्पर्धिनेत्रं प्रसन्नम् ।\nवामाङ्कारूढसीतामुखकमलमिलल्लोचनं नीरदाभं ।\nनानालङ्कारदीप्तं दधतमुरुजटामण्डनं रामचन्द्रम् ॥\nइति ध्यानम् ।",
+   "variants": [
+    {
+     "reading": "दधतमुरुजटामण्डलं",
+     "sources": [
+      "AMB"
+     ],
+     "note": "आमचा पाठ \"मण्डनं\" (SD, PUS)"
+    }
+   ]
+  }
+ ],
+ "verses": [
+  {
+   "text_id": "ramraksha",
+   "n": 1,
+   "devanagari": "चरितं रघुनाथस्य शतकोटिप्रविस्तरम् ।\nएकैकमक्षरं पुंसां महापातकनाशनम् ॥१॥",
+   "meaning_mr": "श्रीरघुनाथाचे चरित्र शंभर कोटी विस्ताराचे आहे; त्यातील प्रत्येक अक्षर माणसाची महापापे नष्ट करणारे आहे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 2,
+   "devanagari": "ध्यात्वा नीलोत्पलश्यामं रामं राजीवलोचनम् ।\nजानकीलक्ष्मणोपेतं जटामुकुटमण्डितम् ॥२॥",
+   "meaning_mr": "निळ्या कमळासारख्या सावळ्या, कमलनयन, जानकी व लक्ष्मणासह असलेल्या, जटामुकुटाने शोभणाऱ्या रामाचे ध्यान करून —",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 3,
+   "devanagari": "सासितूणधनुर्बाणपाणिं नक्तंचरान्तकम् ।\nस्वलीलया जगत्त्रातुमाविर्भूतमजं विभुम् ॥३॥",
+   "meaning_mr": "तलवार, भाता, धनुष्य-बाण हाती धरलेल्या, राक्षसांचा अंत करणाऱ्या, जगाच्या रक्षणासाठी लीलेने प्रकट झालेल्या अजन्मा, सर्वव्यापी प्रभूचे स्मरण करून —",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 4,
+   "devanagari": "रामरक्षां पठेत् प्राज्ञः पापघ्नीं सर्वकामदाम् ।\nशिरो मे राघवः पातु भालं दशरथात्मजः ॥४॥",
+   "meaning_mr": "बुद्धिमानाने पापनाशक व सर्व इच्छा पूर्ण करणारी रामरक्षा पठण करावी. राघव माझ्या मस्तकाचे, दशरथपुत्र कपाळाचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 5,
+   "devanagari": "कौसल्येयो दृशौ पातु विश्वामित्रप्रियः श्रुती ।\nघ्राणं पातु मखत्राता मुखं सौमित्रिवत्सलः ॥५॥",
+   "meaning_mr": "कौसल्यापुत्र डोळ्यांचे, विश्वामित्रांचा प्रिय कानांचे, यज्ञरक्षक नाकाचे आणि सौमित्रीवर प्रेम करणारा मुखाचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 6,
+   "devanagari": "जिह्वां विद्यानिधिः पातु कण्ठं भरतवन्दितः ।\nस्कन्धौ दिव्यायुधः पातु भुजौ भग्नेशकार्मुकः ॥६॥",
+   "meaning_mr": "विद्यानिधी जिभेचे, भरताने वंदिलेला कंठाचे, दिव्य आयुधधारी खांद्यांचे आणि शिवधनुष्य मोडणारा भुजांचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 7,
+   "devanagari": "करौ सीतापतिः पातु हृदयं जामदग्न्यजित् ।\nमध्यं पातु खरध्वंसी नाभिं जाम्बवदाश्रयः ॥७॥",
+   "meaning_mr": "सीतापती हातांचे, परशुरामाला जिंकणारा हृदयाचे, खरराक्षसाचा नाश करणारा मध्यभागाचे आणि जांबवंताचा आश्रय नाभीचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 8,
+   "devanagari": "सुग्रीवेशः कटी पातु सक्थिनी हनुमत्प्रभुः ।\nऊरू रघूत्तमः पातु रक्षःकुलविनाशकृत् ॥८॥",
+   "meaning_mr": "सुग्रीवाचा स्वामी कमरेचे, हनुमंताचा प्रभू जांघांचे (सक्थिनी), राक्षसकुळाचा नाश करणारा रघूत्तम मांड्यांचे (ऊरू) रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "edited-v2",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 9,
+   "devanagari": "जानुनी सेतुकृत्पातु जंघे दशमुखान्तकः ।\nपादौ बिभीषणश्रीदः पातु रामोऽखिलं वपुः ॥९॥",
+   "meaning_mr": "सेतू बांधणारा गुडघ्यांचे, दशमुखाचा अंत करणारा पोटऱ्यांचे, बिभीषणाला ऐश्वर्य देणारा पायांचे आणि राम संपूर्ण शरीराचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 10,
+   "devanagari": "एतां रामबलोपेतां रक्षां यः सुकृती पठेत् ।\nस चिरायुः सुखी पुत्री विजयी विनयी भवेत् ॥१०॥",
+   "meaning_mr": "रामाच्या बळाने युक्त ही रक्षा जो पुण्यवान पठण करतो, तो दीर्घायुषी, सुखी, पुत्रवान, विजयी आणि विनयी होतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 11,
+   "devanagari": "पातालभूतलव्योमचारिणश्छद्मचारिणः ।\nन द्रष्टुमपि शक्तास्ते रक्षितं रामनामभिः ॥११॥",
+   "meaning_mr": "पाताळ, पृथ्वी व आकाशात फिरणारे आणि कपटाने वावरणारे जीव रामनामांनी रक्षिलेल्या माणसाकडे पाहूही शकत नाहीत.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 12,
+   "devanagari": "रामेति रामभद्रेति रामचन्द्रेति वा स्मरन् ।\nनरो न लिप्यते पापैर्भुक्तिं मुक्तिं च विन्दति ॥१२॥",
+   "meaning_mr": "'राम', 'रामभद्र', 'रामचंद्र' असे स्मरण करणारा माणूस पापांनी लिप्त होत नाही; त्याला भोग आणि मोक्ष दोन्ही मिळतात.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 13,
+   "devanagari": "जगज्जैत्रैकमन्त्रेण रामनाम्नाभिरक्षितम् ।\nयः कण्ठे धारयेत्तस्य करस्थाः सर्वसिद्धयः ॥१३॥",
+   "meaning_mr": "जगाला जिंकणाऱ्या या एकमेव मंत्राने, रामनामाने रक्षिलेले हे कवच जो कंठात धारण करतो, त्याच्या हातात सर्व सिद्धी असतात.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 14,
+   "devanagari": "वज्रपञ्जरनामेदं यो रामकवचं स्मरेत् ।\nअव्याहताज्ञः सर्वत्र लभते जयमङ्गलम् ॥१४॥",
+   "meaning_mr": "'वज्रपंजर' नावाचे हे रामकवच जो स्मरतो, त्याची आज्ञा सर्वत्र अबाधित राहते आणि त्याला विजय व मंगल प्राप्त होते.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 15,
+   "devanagari": "आदिष्टवान् यथा स्वप्ने रामरक्षामिमां हरः ।\nतथा लिखितवान् प्रातः प्रबुद्धो बुधकौशिकः ॥१५॥",
+   "meaning_mr": "स्वप्नात शंकरांनी जशी ही रामरक्षा सांगितली, तशीच पहाटे जागे होऊन बुधकौशिकांनी ती लिहिली.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 16,
+   "devanagari": "आरामः कल्पवृक्षाणां विरामः सकलापदाम् ।\nअभिरामस्त्रिलोकानां रामः श्रीमान् स नः प्रभुः ॥१६॥",
+   "meaning_mr": "जो कल्पवृक्षांचे उद्यान, सर्व संकटांचा अंत आणि तिन्ही लोकांना आनंद देणारा आहे, तो श्रीमान राम आमचा प्रभू आहे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 17,
+   "devanagari": "तरुणौ रूपसंपन्नौ सुकुमारौ महाबलौ ।\nपुण्डरीकविशालाक्षौ चीरकृष्णाजिनाम्बरौ ॥१७॥",
+   "meaning_mr": "तरुण, रूपवान, सुकुमार, महाबलवान, कमळासारख्या विशाल डोळ्यांचे, वल्कल व मृगाजिन परिधान करणारे —",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 18,
+   "devanagari": "फलमूलाशिनौ दान्तौ तापसौ ब्रह्मचारिणौ ।\nपुत्रौ दशरथस्यैतौ भ्रातरौ रामलक्ष्मणौ ॥१८॥",
+   "meaning_mr": "फळे-मुळे खाणारे, संयमी, तपस्वी, ब्रह्मचारी असे हे दशरथाचे पुत्र, बंधू राम-लक्ष्मण —",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 19,
+   "devanagari": "शरण्यौ सर्वसत्त्वानां श्रेष्ठौ सर्वधनुष्मताम् ।\nरक्षःकुलनिहन्तारौ त्रायेतां नो रघूत्तमौ ॥१९॥",
+   "meaning_mr": "सर्व प्राण्यांचे आश्रयदाते, सर्व धनुर्धरांत श्रेष्ठ, राक्षसकुळाचा नाश करणारे ते दोघे रघुश्रेष्ठ आमचे रक्षण करोत.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 20,
+   "devanagari": "आत्तसज्यधनुषाविषुस्पृशावक्षयाशुगनिषङ्गसङ्गिनौ ।\nरक्षणाय मम रामलक्ष्मणावग्रतः पथि सदैव गच्छताम् ॥२०॥",
+   "meaning_mr": "धनुष्य सज्ज करून बाणाला हात लावलेले, अक्षय बाणांचे भाते धारण केलेले राम-लक्ष्मण माझ्या रक्षणासाठी मार्गात सदैव माझ्यापुढे चालोत.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 21,
+   "devanagari": "संनद्धः कवची खड्गी चापबाणधरो युवा ।\nगच्छन् मनोरथोऽस्माकं रामः पातु सलक्ष्मणः ॥२१॥",
+   "meaning_mr": "सज्ज, कवचधारी, तलवार व धनुष्य-बाण धरलेला, तरुण, आमच्या मनोरथाप्रमाणे चालणारा राम लक्ष्मणासह आमचे रक्षण करो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": [
+    {
+     "reading": "गच्छन्मनोरथान्नश्च",
+     "sources": [
+      "AMB"
+     ],
+     "note": "आमचा पाठ \"मनोरथोऽस्माकं\" (PUS, SD-AR, विकिस्रोत)"
+    }
+   ]
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 22,
+   "devanagari": "रामो दाशरथिः शूरो लक्ष्मणानुचरो बली ।\nकाकुत्स्थः पुरुषः पूर्णः कौसल्येयो रघूत्तमः ॥२२॥",
+   "meaning_mr": "राम दशरथपुत्र, शूर, लक्ष्मण ज्याचा अनुचर आहे असा बलवान, काकुत्स्थ, पूर्ण पुरुष, कौसल्यापुत्र, रघूत्तम आहे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 23,
+   "devanagari": "वेदान्तवेद्यो यज्ञेशः पुराणपुरुषोत्तमः ।\nजानकीवल्लभः श्रीमानप्रमेयपराक्रमः ॥२३॥",
+   "meaning_mr": "वेदांताने जाणण्यायोग्य, यज्ञांचा स्वामी, पुराणपुरुषोत्तम, जानकीवल्लभ, श्रीमान आणि अपार पराक्रमी आहे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 24,
+   "devanagari": "इत्येतानि जपन् नित्यं मद्भक्तः श्रद्धयान्वितः ।\nअश्वमेधाधिकं पुण्यं संप्राप्नोति न संशयः ॥२४॥",
+   "meaning_mr": "ही नावे श्रद्धेने रोज जपणारा माझा भक्त अश्वमेधापेक्षा अधिक पुण्य निःसंशय मिळवतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 25,
+   "devanagari": "रामं दूर्वादलश्यामं पद्माक्षं पीतवाससम् ।\nस्तुवन्ति नामभिर्दिव्यैर्न ते संसारिणो नराः ॥२५॥",
+   "meaning_mr": "दूर्वेसारख्या सावळ्या, कमलनयन, पीतांबरधारी रामाची दिव्य नावांनी जे स्तुती करतात, ते संसारात अडकत नाहीत.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": [
+    {
+     "reading": "संसारिणो नरः",
+     "sources": [
+      "PUS"
+     ],
+     "note": "व्याकरणदृष्ट्या \"नराः\" निवडले"
+    }
+   ]
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 26,
+   "devanagari": "रामं लक्ष्मणपूर्वजं रघुवरं सीतापतिं सुन्दरं ।\nकाकुत्स्थं करुणार्णवं गुणनिधिं विप्रप्रियं धार्मिकम् ।\nराजेन्द्रं सत्यसन्धं दशरथतनयं श्यामलं शान्तमूर्तिं ।\nवन्दे लोकाभिरामं रघुकुलतिलकं राघवं रावणारिम् ॥२६॥",
+   "meaning_mr": "लक्ष्मणाचे थोरले बंधू, रघुश्रेष्ठ, सीतापती, सुंदर, काकुत्स्थ, करुणासागर, गुणांचे निधान, विप्रांना प्रिय, धार्मिक, राजाधिराज, सत्यप्रतिज्ञ, दशरथपुत्र, सावळे, शांतमूर्ती, सर्व लोकांना आनंद देणारे, रघुकुलतिलक, राघव आणि रावणाचे शत्रू अशा श्रीरामाला मी वंदन करतो.",
+   "meaning_status": "draft",
+   "meaning_review": "rewritten-v2",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 27,
+   "devanagari": "रामाय रामभद्राय रामचंद्राय वेधसे ।\nरघुनाथाय नाथाय सीतायाः पतये नमः ॥२७॥",
+   "meaning_mr": "राम, रामभद्र, रामचंद्र, विधाता (वेधस्), रघुनाथ, नाथ आणि सीतापती अशा श्रीरामाला नमस्कार.",
+   "meaning_status": "draft",
+   "meaning_review": "edited-v2",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 28,
+   "devanagari": "श्रीराम राम रघुनन्दन राम राम ।\nश्रीराम राम भरताग्रज राम राम ।\nश्रीराम राम रणकर्कश राम राम ।\nश्रीराम राम शरणं भव राम राम ॥२८॥",
+   "meaning_mr": "हे श्रीराम, रघुनंदन, भरताचे थोरले बंधू, रणात कठोर राम — मला शरण दे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 29,
+   "devanagari": "श्रीरामचन्द्रचरणौ मनसा स्मरामि ।\nश्रीरामचन्द्रचरणौ वचसा गृणामि ।\nश्रीरामचन्द्रचरणौ शिरसा नमामि ।\nश्रीरामचन्द्रचरणौ शरणं प्रपद्ये ॥२९॥",
+   "meaning_mr": "श्रीरामचंद्रांच्या चरणांचे मी मनाने स्मरण करतो, वाणीने गुणगान करतो, मस्तकाने नमन करतो आणि त्यांना शरण जातो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 30,
+   "devanagari": "माता रामो मत्पिता रामचन्द्रः ।\nस्वामी रामो मत्सखा रामचन्द्रः ।\nसर्वस्वं मे रामचन्द्रो दयालुः ।\nनान्यं जाने नैव जाने न जाने ॥३०॥",
+   "meaning_mr": "राम माझी आई, रामचंद्र माझे वडील, स्वामी व सखा आहेत; दयाळू रामचंद्रच माझे सर्वस्व आहेत; दुसरे कोणी मी जाणत नाही.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": [
+    {
+     "reading": "सर्वस्वं मे रामचन्द्रो दयालुर्नान्यं जाने नैव जाने न जाने",
+     "sources": [
+      "AMB",
+      "PUS",
+      "MRWS-RR"
+     ],
+     "note": "छापील प्रतींत संधी \"दयालुर्नान्यं\"; येथे विकिस्रोताचे \"दयालुः\" ठेवले"
+    }
+   ]
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 31,
+   "devanagari": "दक्षिणे लक्ष्मणो यस्य वामे तु जनकात्मजा ।\nपुरतो मारुतिर्यस्य तं वन्दे रघुनन्दनम् ॥३१॥",
+   "meaning_mr": "ज्याच्या उजवीकडे लक्ष्मण, डावीकडे जानकी आणि समोर मारुती आहे, त्या रघुनंदनाला मी वंदन करतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": [
+    {
+     "reading": "वामे च जनकात्मजा",
+     "sources": [
+      "AMB"
+     ],
+     "note": "आमचा पाठ \"वामे तु\" (PUS, MRWS-RR)"
+    }
+   ]
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 32,
+   "devanagari": "लोकाभिरामं रणरङ्गधीरं राजीवनेत्रं रघुवंशनाथम् ।\nकारुण्यरूपं करुणाकरं तं श्रीरामचन्द्रं शरणं प्रपद्ये ॥३२॥",
+   "meaning_mr": "जगाला आनंद देणारा, रणात धीर, कमलनयन, रघुवंशाचा नाथ, करुणामूर्ती अशा श्रीरामचंद्रांना मी शरण जातो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 33,
+   "devanagari": "मनोजवं मारुततुल्यवेगं । जितेन्द्रियं बुद्धिमतां वरिष्ठं ।\nवातात्मजं वानरयूथमुख्यं । श्रीरामदूतं शरणं प्रपद्ये ॥३३॥",
+   "meaning_mr": "मनासारखा वेगवान, वाऱ्याच्या गतीचा, जितेंद्रिय, बुद्धिमानांत श्रेष्ठ, वायुपुत्र, वानरसेनेचा प्रमुख अशा श्रीरामदूताला मी शरण जातो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 34,
+   "devanagari": "कूजन्तं रामरामेति मधुरं मधुराक्षरम् ।\nआरुह्य कविताशाखां वन्दे वाल्मीकिकोकिलम् ॥३४॥",
+   "meaning_mr": "कवितारूपी फांदीवर बसून 'राम राम' अशी मधुर कूजन करणाऱ्या वाल्मीकीरूपी कोकिळाला मी वंदन करतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 35,
+   "devanagari": "आपदामपहर्तारं दातारं सर्वसंपदाम् ।\nलोकाभिरामं श्रीरामं भूयो भूयो नमाम्यहम् ॥३५॥",
+   "meaning_mr": "संकटे दूर करणाऱ्या, सर्व संपत्ती देणाऱ्या, जगाला आनंद देणाऱ्या श्रीरामाला मी पुन्हा पुन्हा नमस्कार करतो.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 36,
+   "devanagari": "भर्जनं भवबीजानामर्जनं सुखसंपदाम् ।\nतर्जनं यमदूतानां रामरामेति गर्जनम् ॥३६॥",
+   "meaning_mr": "'राम राम' ही गर्जना संसाराची बीजे जाळते, सुखसंपत्ती मिळवून देते आणि यमदूतांना धाक दाखवते.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 37,
+   "devanagari": "रामो राजमणिः सदा विजयते रामं रमेशं भजे ।\nरामेणाभिहता निशाचरचमू रामाय तस्मै नमः ।\nरामान्नास्ति परायणं परतरं रामस्य दासोऽस्म्यहं ।\nरामे चित्तलयः सदा भवतु मे भो राम मामुद्धर ॥३७॥",
+   "meaning_mr": "राजांत रत्नासारखा राम सदा विजयी आहे; रमापती रामाला मी भजतो; रामाने राक्षससेना मारली, त्या रामाला नमस्कार; रामाहून श्रेष्ठ आश्रय नाही; मी रामाचा दास आहे; माझे चित्त रामात लीन होवो; हे राम, माझा उद्धार कर.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  },
+  {
+   "text_id": "ramraksha",
+   "n": 38,
+   "devanagari": "राम रामेति रामेति रमे रामे मनोरमे ।\nसहस्रनाम तत्तुल्यं रामनाम वरानने ॥३८॥",
+   "meaning_mr": "(शिव पार्वतीला म्हणतात) हे सुंदरी, 'राम राम' असे म्हणत मी मनोहर रामात रमतो; एक रामनाम सहस्रनामाइतके आहे.",
+   "meaning_status": "draft",
+   "meaning_review": "unreviewed",
+   "source_url": "https://sa.wikisource.org/w/index.php?oldid=403980",
+   "rev_id": 403980,
+   "variants": []
+  }
+ ],
+ "back": [
+  {
+   "id": "colophon",
+   "label": "समाप्ती",
+   "kind": "prose",
+   "devanagari": "इति श्रीबुधकौशिकविरचितं श्रीरामरक्षास्तोत्रं सम्पूर्णम् ।"
+  }
+ ],
+ "corrections": [
+  {
+   "where": "विनियोग",
+   "from": "अनुष्ठुप् छन्दः",
+   "to": "अनुष्टुप् छन्दः",
+   "kind": "typo",
+   "basis": "छंदाचे नाव अनुष्टुप्",
+   "sources": [
+    "SD",
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "विनियोग",
+   "from": "छ्न्दः",
+   "to": "छन्दः",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD",
+    "PUS",
+    "AMB"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "विनियोग",
+   "from": "श्रीरामचन्द्रप्रित्यर्थे",
+   "to": "श्रीरामचन्द्रप्रीत्यर्थे",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD",
+    "PUS",
+    "AMB"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "ध्यान",
+   "from": "वामाङ्कारूढसीता मुखकमलमिलल्लोचनं",
+   "to": "वामाङ्कारूढसीतामुखकमलमिलल्लोचनं",
+   "kind": "spacing",
+   "basis": "एकच समास; सीता नंतरची फट चुकीची",
+   "sources": [
+    "AMB"
+   ],
+   "status": "verified (SD, PUS break after रूढ instead)",
+   "release": "v2"
+  },
+  {
+   "where": "ध्यान",
+   "from": "ध्रुतशरधनुषं",
+   "to": "धृतशरधनुषं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "ध्यान",
+   "from": "बदधपद्मासनस्तं",
+   "to": "बद्धपद्मासनस्थं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "ध्यान",
+   "from": "वामाङ्कारुढसीता",
+   "to": "वामाङ्कारूढसीता",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥१॥",
+   "from": "एकैकमक्षरम् पुंसां",
+   "to": "एकैकमक्षरं पुंसां",
+   "kind": "orthography",
+   "basis": "अनुस्वार",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥३॥",
+   "from": "जगतत्रातुभाविर्भूतमजं",
+   "to": "जगत्त्रातुमाविर्भूतमजं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "SD-AR",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥४॥",
+   "from": "पापन्घीं",
+   "to": "पापघ्नीं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "PUS",
+    "SD-AR"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥५॥",
+   "from": "ध्रुशौ",
+   "to": "दृशौ",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥६॥",
+   "from": "जिव्हां",
+   "to": "जिह्वां",
+   "kind": "orthography",
+   "basis": "संस्कृत रूप जिह्वा (जिव्हा हे मराठी लेखन)",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥७॥",
+   "from": "सितापतिः",
+   "to": "सीतापतिः",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥७॥",
+   "from": "ह्र्दयं",
+   "to": "हृदयं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥१३॥",
+   "from": "रामनामाभिरक्षितम्",
+   "to": "रामनाम्नाभिरक्षितम्",
+   "kind": "grammar",
+   "basis": "तृतीया नाम्ना (नावाने)",
+   "sources": [
+    "AMB",
+    "PUS",
+    "SD"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥१८॥",
+   "from": "फ़लमूलाशिनौ",
+   "to": "फलमूलाशिनौ",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "PUS"
+   ],
+   "status": "verified (one text + AMB translation)",
+   "release": "v1"
+  },
+  {
+   "where": "॥१८॥",
+   "from": "ब्रम्हचारिणौ",
+   "to": "ब्रह्मचारिणौ",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "PUS"
+   ],
+   "status": "verified (one text + AMB translation)",
+   "release": "v1"
+  },
+  {
+   "where": "॥१९॥",
+   "from": "रक्षः कुलनिहन्तारौ",
+   "to": "रक्षःकुलनिहन्तारौ",
+   "kind": "spacing",
+   "basis": "एकच समास",
+   "sources": [
+    "SD"
+   ],
+   "status": "sources disagree (PUS keeps the space)",
+   "release": "v2"
+  },
+  {
+   "where": "॥२०॥",
+   "from": "निषड्गसड्गिनौ",
+   "to": "निषङ्गसङ्गिनौ",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥२०॥",
+   "from": "रक्षणायमम",
+   "to": "रक्षणाय मम",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥२१॥",
+   "from": "चापबाणोधरो",
+   "to": "चापबाणधरो",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥२१॥",
+   "from": "गच्छ्न्",
+   "to": "गच्छन्",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "PUS"
+   ],
+   "status": "verified (AMB differs on the next word)",
+   "release": "v1"
+  },
+  {
+   "where": "॥२५॥",
+   "from": "नामभिर्दिव्यैः न ते संसारिणो नरः",
+   "to": "नामभिर्दिव्यैर्न ते संसारिणो नराः",
+   "kind": "grammar",
+   "basis": "ते … नराः अनेकवचन; संधी दिव्यैर्न",
+   "sources": [
+    "AMB",
+    "WDM"
+   ],
+   "status": "sources disagree (PUS reads नरः)",
+   "release": "v2"
+  },
+  {
+   "where": "॥२६॥",
+   "from": "दशरथनयं",
+   "to": "दशरथतनयं",
+   "kind": "meter",
+   "basis": "स्रग्धरा चरणात २१ अक्षरे हवीत; त गळला होता",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥३०॥",
+   "from": "स्वामि रामो",
+   "to": "स्वामी रामो",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS",
+    "MRWS-RR"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥३०॥",
+   "from": "दयालुः नान्यं । / जाने नैव…",
+   "to": "दयालुः । / नान्यं जाने नैव… (ओळ-विभागणी)",
+   "kind": "layout",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [],
+   "status": "layout only; printed sources write दयालुर्नान्यं (sandhi) — reviewer to choose",
+   "release": "v1"
+  },
+  {
+   "where": "॥३३॥",
+   "from": "जितेद्रियं",
+   "to": "जितेन्द्रियं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥३३॥",
+   "from": "दुद्धिमतां",
+   "to": "बुद्धिमतां",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥३४॥",
+   "from": "मधुरं मधुराक्षरम्",
+   "to": "मधुरं मधुराक्षरम् ।",
+   "kind": "punctuation",
+   "basis": "पूर्वार्धानंतर दंड",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥३७॥",
+   "from": "रामो राजमणि सदा",
+   "to": "रामो राजमणिः सदा",
+   "kind": "meter",
+   "basis": "प्रथमा विसर्ग; शार्दूलविक्रीडित गुरु अक्षर",
+   "sources": [
+    "AMB",
+    "PUS",
+    "SAWS2"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥३७॥",
+   "from": "भवतु भो राम",
+   "to": "भवतु मे भो राम",
+   "kind": "meter",
+   "basis": "एक अक्षर गळले होते (१९ अक्षरे हवीत)",
+   "sources": [
+    "AMB",
+    "PUS",
+    "SANATAN"
+   ],
+   "status": "verified",
+   "release": "v2"
+  },
+  {
+   "where": "॥३७॥",
+   "from": "दासोऽस्मयं",
+   "to": "दासोऽस्म्यहं",
+   "kind": "typo",
+   "basis": "v1 (प्रोटोटाइप) दुरुस्ती",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v1"
+  },
+  {
+   "where": "॥३८॥",
+   "from": "रामनामेति रामेति",
+   "to": "राम रामेति रामेति",
+   "kind": "reading",
+   "basis": "इतर सर्व पाठ \"राम रामेति रामेति\"",
+   "sources": [
+    "AMB",
+    "PUS"
+   ],
+   "status": "verified",
+   "release": "v2"
+  }
+ ],
+ "sources": {
+  "SAWS": {
+   "name": "संस्कृत विकिस्रोत: रामरक्षास्तोत्रम् (आवृत्ती 403980, मूळ आधार)",
+   "url": "https://sa.wikisource.org/w/index.php?oldid=403980"
+  },
+  "PUS": {
+   "name": "Sanskrit Pustakalaya – Stotra Sangraha",
+   "url": "https://sanskritpustakalaya.com/stotrasangraha/sri-ramarakshastotram/"
+  },
+  "AMB": {
+   "name": "Ambuda – रामरक्षास्तोत्रं सानुवादम् (मुद्रित प्रत, प्रूफरीड)",
+   "url": "https://ambuda.org/texts/ramarakshastotram-translation/all"
+  },
+  "SD": {
+   "name": "sanskritdocuments.org – rraksha (search snippets only)",
+   "url": "https://sanskritdocuments.org/doc_raama/rraksha.html"
+  },
+  "SD-AR": {
+   "name": "sanskritdocuments.org – Ananda Ramayana recension (snippet)",
+   "url": "https://sanskritdocuments.org/doc_raama/completerraksha.itx"
+  },
+  "SAWS2": {
+   "name": "संस्कृत विकिस्रोत: श्री रामरक्षा स्तोत्र (snippet)",
+   "url": "https://sa.wikisource.org/wiki/%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%80_%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE_%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B0"
+  },
+  "MRWS-RR": {
+   "name": "मराठी विकिस्रोत: रामरक्षा (snippet)",
+   "url": "https://mr.wikisource.org/wiki/%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE"
+  },
+  "WDM": {
+   "name": "Webdunia Marathi – रामरक्षा अर्थासह",
+   "url": "https://marathi.webdunia.com/article/ram-navami-marathi/ram-raksha-stotra-meaning-in-marathi-123032500015_1.html"
+  },
+  "SANATAN": {
+   "name": "sanatan.org – रामरक्षा (Hindi)",
+   "url": "https://www.sanatan.org/hindi/ramraksha"
+  }
+ }
+}
