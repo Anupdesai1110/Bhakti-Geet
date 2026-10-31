@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="mr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>माझी स्तोत्रे</title>
+<meta name="description" content="रामरक्षा व भीमरूपी स्तोत्र — मोठ्या अक्षरांत, ऑफलाइन, जाहिरातमुक्त.">
+<meta name="theme-color" content="#FBF7EF" id="themeColor">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="स्तोत्रे">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preload" href="fonts/NotoSerifDevanagari-Regular-subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <main id="reader" class="reader" aria-label="वाचन">
+    <div id="viewport" class="viewport">
+      <div id="track" class="track">
+        <section class="page" data-slot="prev" aria-hidden="true"></section>
+        <section class="page" data-slot="cur" aria-live="polite"></section>
+        <section class="page" data-slot="next" aria-hidden="true"></section>
+      </div>
+      <div class="zones" id="zones">
+        <button type="button" class="zone" id="zPrev" aria-label="मागील पान"></button>
+        <button type="button" class="zone" id="zMid" aria-label="पर्याय दाखवा किंवा लपवा" aria-expanded="false"></button>
+        <button type="button" class="zone" id="zNext" aria-label="पुढील पान"></button>
+      </div>
+    </div>
+    <div id="scroller" class="scroller" hidden></div>
+    <div id="welcome" class="welcome" hidden>
+      <p class="welcome-name">माझी स्तोत्रे</p>
+      <p class="welcome-sub">वाचण्यासाठी यादीतून स्तोत्र निवडा</p>
+    </div>
+    <p id="pageno" class="pageno" aria-hidden="true"></p>
+  </main>
+
+  <header class="bar top" id="topbar">
+    <button type="button" class="iconbtn" id="menuBtn" aria-label="स्तोत्रांची यादी" aria-haspopup="dialog" aria-controls="drawer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button type="button" class="bartitle" id="barTitle" aria-label="स्तोत्रांची यादी उघडा"></button>
+    <button type="button" class="iconbtn labeled" id="settingsBtn" aria-haspopup="dialog" aria-controls="settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+      <span>सेटिंग्ज</span>
+    </button>
+  </header>
+
+  <nav class="bar bottom" id="bottombar" aria-label="वाचन पर्याय">
+    <button type="button" class="act" id="reciteBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+      <span>पारायण</span>
+    </button>
+    <button type="button" class="act" id="countBtn" aria-describedby="countHelp">
+      <span class="cnt" id="countLbl">०/११</span>
+      <span>जप मोजा</span>
+    </button>
+    <button type="button" class="act" id="shareBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 13v6h14v-6"/></svg>
+      <span>शेअर</span>
+    </button>
+    <span id="countHelp" class="sr">एक पूर्ण पठण झाल्यावर दाबा</span>
+  </nav>
+
+  <div class="bar recitebar" id="recitebar" hidden>
+    <button type="button" class="act" id="playBtn" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="ico-play"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="ico-pause"><path d="M8 5v14M16 5v14"/></svg>
+      <span id="playLbl">सुरू करा</span>
+    </button>
+    <div class="speed" role="group" aria-label="वेग">
+      <button type="button" class="stepbtn" id="slowBtn" aria-label="वेग कमी">−</button>
+      <span class="speedval"><span id="speedLbl">४</span><small>वेग</small></span>
+      <button type="button" class="stepbtn" id="fastBtn" aria-label="वेग जास्त">+</button>
+    </div>
+    <button type="button" class="act" id="countBtn2"><span class="cnt" id="countLbl2">०/११</span><span>जप मोजा</span></button>
+    <button type="button" class="act" id="reciteClose">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      <span>बंद</span>
+    </button>
+  </div>
+  <p class="recite-note" id="reciteNote" hidden></p>
+</div>
+
+<div id="hint" class="hint" hidden role="dialog" aria-label="वाचायचे कसे">
+      <div class="hz"><span class="hl">‹</span><span>मागचे पान</span></div>
+      <div class="hz mid"><span class="hl">•</span><span>पर्याय दाखवा</span></div>
+      <div class="hz"><span class="hl">›</span><span>पुढचे पान</span></div>
+      <p class="hfoot">टॅप करा किंवा बोटाने पान डावीकडे-उजवीकडे सरकवा.<br><strong>सुरू करण्यासाठी कुठेही टॅप करा.</strong></p>
+    </div>
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+  <div class="drawer-head">
+    <h2 class="app-name" id="drawerTitle" tabindex="-1">माझी स्तोत्रे</h2>
+    <button type="button" class="iconbtn" id="drawerClose" aria-label="यादी बंद करा">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="seg" role="group" aria-label="यादी कशी पाहायची">
+    <button type="button" id="browseGroup" aria-pressed="true">देव / संत</button>
+    <button type="button" id="browseLang" aria-pressed="false">भाषा</button>
+  </div>
+  <div class="dlist" id="dlist"></div>
+  <div class="dfoot">
+    <button type="button" class="drow" id="aboutBtn">माहिती व श्रेय</button>
+  </div>
+</aside>
+
+<div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2 id="settingsTitle">सेटिंग्ज</h2>
+      <button type="button" class="iconbtn labeled" id="settingsClose"><span>बंद</span></button>
+    </div>
+
+    <section class="sec">
+      <h3 id="sizeH">अक्षरांचा आकार</h3>
+      <p class="preview" id="preview" aria-hidden="true">श्रीराम जय राम जय जय राम</p>
+      <div class="sizerow">
+        <button type="button" class="stepbtn" id="sizeDown" aria-label="अक्षरे लहान">अ−</button>
+        <input type="range" id="sizeRange" min="20" max="56" step="1" value="34" aria-labelledby="sizeH" aria-valuetext="३४">
+        <button type="button" class="stepbtn big" id="sizeUp" aria-label="अक्षरे मोठी">अ+</button>
+      </div>
+      <p class="val" id="sizeVal">३४</p>
+    </section>
+
+    <section class="sec">
+      <h3>रंग</h3>
+      <div class="choices three" role="group" aria-label="रंग">
+        <button type="button" class="choice sw-paper" data-theme-choice="paper" aria-pressed="false">कागद</button>
+        <button type="button" class="choice sw-sepia" data-theme-choice="sepia" aria-pressed="false">सेपिया</button>
+        <button type="button" class="choice sw-night" data-theme-choice="night" aria-pressed="false">रात्र</button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h3>अर्थ</h3>
+      <label class="switch"><input type="checkbox" id="meaningToggle"><span class="track-s" aria-hidden="true"></span><span class="lbl">मराठी अर्थ दाखवा</span></label>
+      <p class="note">अर्थ हा संगणकाने (AI) तयार केलेला मसुदा आहे; तज्ज्ञांची तपासणी अजून व्हायची आहे.</p>
+    </section>
+
+    <section class="sec">
+      <h3>वाचण्याची पद्धत</h3>
+      <div class="choices two" role="group" aria-label="वाचण्याची पद्धत">
+        <button type="button" class="choice" data-mode-choice="page" aria-pressed="true">पान उलटणे</button>
+        <button type="button" class="choice" data-mode-choice="scroll" aria-pressed="false">खाली सरकवणे</button>
+      </div>
+      <label class="switch"><input type="checkbox" id="motionToggle"><span class="track-s" aria-hidden="true"></span><span class="lbl">पान उलटताना हलकी हालचाल</span></label>
+    </section>
+
+    <section class="sec">
+      <h3 id="targetH">जप संकल्प</h3>
+      <div class="sizerow">
+        <button type="button" class="stepbtn" id="targetDown" aria-label="संकल्प कमी">−</button>
+        <output class="bigval" id="targetVal" aria-labelledby="targetH">११</output>
+        <button type="button" class="stepbtn" id="targetUp" aria-label="संकल्प जास्त">+</button>
+      </div>
+      <div class="chips" role="group" aria-label="पटकन निवडा">
+        <button type="button" class="chip" data-target="1">१</button>
+        <button type="button" class="chip" data-target="11">११</button>
+        <button type="button" class="chip" data-target="21">२१</button>
+        <button type="button" class="chip" data-target="108">१०८</button>
+      </div>
+      <p class="note" id="countNow"></p>
+      <button type="button" class="wide" id="countReset">या स्तोत्राची जप-संख्या शून्य करा</button>
+    </section>
+
+    <section class="sec">
+      <h3>स्मरण</h3>
+      <p class="note strong">फोनवर ‘माझी स्तोत्रे’ बंद असताना ते स्वतःहून आठवण करू शकत नाही. आठवण हवी असल्यास फोनच्या कॅलेंडरमध्ये रोजची किंवा साप्ताहिक आठवण जोडा.</p>
+      <div class="remind">
+        <p class="rtitle">रामरक्षा — रोज सायंकाळी ७ वाजता</p>
+        <div class="rbtns">
+          <a class="wide" id="gcalRR" target="_blank" rel="noopener">Google Calendar मध्ये जोडा</a>
+          <a class="wide alt" href="reminders/ramraksha-daily-1900.ics" target="_blank" rel="noopener">iPhone / इतर कॅलेंडर</a>
+        </div>
+      </div>
+      <div class="remind">
+        <p class="rtitle">भीमरूपी — दर शनिवारी सकाळी ७ वाजता</p>
+        <div class="rbtns">
+          <a class="wide" id="gcalBH" target="_blank" rel="noopener">Google Calendar मध्ये जोडा</a>
+          <a class="wide alt" href="reminders/bhimrupi-saturday-0700.ics" target="_blank" rel="noopener">iPhone / इतर कॅलेंडर</a>
+        </div>
+      </div>
+      <p class="note">वेळ नंतर कॅलेंडरमध्ये बदलता येते. Google Calendar साठी इंटरनेट लागते.</p>
+    </section>
+  </div>
+</div>
+
+<div class="sheet full" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2 id="aboutTitle">माहिती व श्रेय</h2>
+      <button type="button" class="iconbtn labeled" id="aboutClose"><span>बंद</span></button>
+    </div>
+    <div id="credits" class="credits"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="measure" id="measure" aria-hidden="true"></div>
+<noscript><p class="noscript">‘माझी स्तोत्रे’ चालण्यासाठी JavaScript सुरू असणे आवश्यक आहे.</p></noscript>
+<script src="app.js" defer></script>
+</body>
+</html>

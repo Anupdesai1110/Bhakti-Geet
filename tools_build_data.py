@@ -1,0 +1,112 @@
+"""Build step for the app (stdlib only).
+
+Run from anywhere:  python3 tools_build_data.py
+  1. validates data/catalog.json and every text file it lists (counts, numbering, fields),
+  2. writes CORRECTIONS.md from the `corrections` and `variants` recorded in the data files,
+  3. writes the calendar reminder files in reminders/ (RFC 5545, CRLF, folded lines),
+  4. writes the precache list and a content-hash VERSION into sw.js.
+
+The data files are the source of truth. The v1 prototype parsed raw Wikisource dumps (raw/),
+which were not in the bundle; to re-check against Wikisource, fetch the pinned revisions:
+  https://sa.wikisource.org/w/index.php?oldid=403980&action=raw
+  https://mr.wikisource.org/w/index.php?oldid=156943&action=raw
+"""
+import hashlib, json, os, re, sys
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+DIG = '०१२३४५६७८९'
+def dn(n): return ''.join(DIG[int(c)] for c in str(n))
+def rel(*p): return os.path.join(ROOT, *p)
+def fail(msg): sys.exit('BUILD FAILED: ' + msg)
+
+# ------------------------------------------------------------------ 1. validate
+catalog = json.load(open(rel('data', 'catalog.json'), encoding='utf-8'))
+gids = {g['id'] for g in catalog['groups']}
+lids = {l['id'] for l in catalog['languages']}
+texts = {}
+for e in catalog['texts']:
+    if e['lang'] not in lids: fail(f"{e['id']}: unknown language {e['lang']}")
+    if not e.get('groups') or not set(e['groups']) <= gids: fail(f"{e['id']}: unknown or missing group")
+    d = json.load(open(rel(e['file']), encoding='utf-8'))
+    if d['id'] != e['id'] or d['lang'] != e['lang']: fail(f"{e['id']}: catalog/data mismatch")
+    ns = [v['n'] for v in d['verses']]
+    if ns != list(range(1, len(ns) + 1)): fail(f"{e['id']}: verses not numbered 1..n")
+    if len(ns) != e['verses']: fail(f"{e['id']}: catalog says {e['verses']} verses, data has {len(ns)}")
+    for v in d['verses']:
+        if not v['devanagari'].rstrip().endswith('॥' + dn(v['n']) + '॥'): fail(f"{e['id']} {v['n']}: does not end with its number")
+        if not v.get('meaning_mr', '').strip(): fail(f"{e['id']} {v['n']}: empty meaning")
+    texts[e['id']] = d
+
+# ------------------------------------------------------------------ 2. CORRECTIONS.md
+out = ['# दुरुस्त्या व पाठभेद (Corrections and variants)', '',
+       'Policy: the Wikisource revision is the base text. A reading is changed only when it is a clear error',
+       '(typo, broken word, grammar, metre) **and** the corrected reading is attested in at least one other source.',
+       'Readings where sources merely differ are recorded as variants and left unchanged for the human reviewer.',
+       'This file is generated from `data/*.json` by `tools_build_data.py`.', '']
+for tid, d in texts.items():
+    src = d['sources']
+    out += [f"## {d['title']} ({tid})", '',
+            f"Base: [{d['source']['site']} — {d['source']['page']}]({d['source']['url']}), revision {d['source']['rev_id']}, "
+            f"{d['source']['credit']}, CC BY-SA 4.0. Corrected text: CC BY-SA 4.0. Meanings: CC0 1.0 (AI draft, unreviewed).", '',
+            '| # | where | before | after | kind | basis | sources | status | in |', '|---|---|---|---|---|---|---|---|---|']
+    for i, c in enumerate(d['corrections'], 1):
+        out.append(f"| {i} | {c['where']} | {c['from']} | {c['to']} | {c['kind']} | {c['basis']} | {', '.join(c['sources']) or '—'} | {c['status']} | {c['release']} |")
+    var_rows = []
+    for blk in d.get('front', []) + d['verses']:
+        where = blk.get('label') or ('॥' + dn(blk['n']) + '॥')
+        for v in blk.get('variants', []):
+            var_rows.append(f"| {where} | {v['reading']} | {', '.join(v['sources'])} | {v['note']} |")
+    if var_rows:
+        out += ['', 'Variants recorded, text not changed:', '', '| where | other reading | sources | note |', '|---|---|---|---|'] + var_rows
+    rev = [f"| ॥{dn(v['n'])}॥ | {v['meaning_review']} |" for v in d['verses'] if v.get('meaning_review', 'unreviewed') != 'unreviewed']
+    if rev:
+        out += ['', 'Meaning drafts edited or flagged in v2 (all meanings remain drafts):', '', '| verse | status |', '|---|---|'] + rev
+    out += ['', 'Sources:', ''] + [f"- **{k}**: [{v['name']}]({v['url']})" for k, v in src.items()] + ['']
+with open(rel('CORRECTIONS.md'), 'w', encoding='utf-8') as f:
+    f.write('\n'.join(out))
+
+# ------------------------------------------------------------------ 3. reminders (.ics)
+def fold(line):
+    parts, cur, limit = [], '', 75
+    for ch in line:
+        if len((cur + ch).encode('utf-8')) > limit:
+            parts.append(cur); cur = ch; limit = 74  # continuation lines start with one space
+        else:
+            cur += ch
+    parts.append(cur)
+    return '\r\n '.join(parts)
+
+def ics(uid, start, rrule, summary, desc):
+    lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Majhi Stotre//mr', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+             'BEGIN:VEVENT', f'UID:{uid}', 'DTSTAMP:20261030T000000Z', f'DTSTART:{start}', 'DURATION:PT15M',
+             f'RRULE:{rrule}', f'SUMMARY:{summary}', f'DESCRIPTION:{desc}', 'TRANSP:TRANSPARENT',
+             'BEGIN:VALARM', 'ACTION:DISPLAY', f'DESCRIPTION:{summary}', 'TRIGGER:PT0M', 'END:VALARM',
+             'END:VEVENT', 'END:VCALENDAR']
+    return '\r\n'.join(fold(l) for l in lines) + '\r\n'
+
+os.makedirs(rel('reminders'), exist_ok=True)
+# floating local times (no TZID): the phone's own time zone applies
+with open(rel('reminders', 'ramraksha-daily-1900.ics'), 'w', encoding='utf-8', newline='') as f:
+    f.write(ics('ramraksha-daily-1900@majhi-stotre', '20260101T190000', 'FREQ=DAILY',
+                'रामरक्षा स्तोत्र', '‘माझी स्तोत्रे’ उघडून रामरक्षा पठण करा.'))
+with open(rel('reminders', 'bhimrupi-saturday-0700.ics'), 'w', encoding='utf-8', newline='') as f:
+    f.write(ics('bhimrupi-saturday-0700@majhi-stotre', '20260103T070000', 'FREQ=WEEKLY;BYDAY=SA',
+                'भीमरूपी स्तोत्र', '‘माझी स्तोत्रे’ उघडून भीमरूपी (मारुती) स्तोत्र पठण करा.'))
+
+# ------------------------------------------------------------------ 4. sw.js precache list + version
+runtime = ['index.html', 'app.js', 'style.css', 'manifest.webmanifest']
+for sub, pat in [('data', r'\.json$'), ('fonts', r'\.(woff2|txt)$'), ('icons', r'\.png$'), ('reminders', r'\.ics$')]:
+    runtime += sorted(f'{sub}/{n}' for n in os.listdir(rel(sub)) if re.search(pat, n))
+h = hashlib.sha256()
+for p in runtime:
+    h.update(p.encode()); h.update(open(rel(p), 'rb').read())
+version = h.hexdigest()[:12]
+assets = ['./'] + ['./' + p for p in runtime]
+sw = open(rel('sw.js'), encoding='utf-8').read()
+sw, n1 = re.subn(r"^const VERSION = '.*?';$", f"const VERSION = '{version}';", sw, flags=re.M)
+sw, n2 = re.subn(r"^const ASSETS = \[.*?\];$", 'const ASSETS = ' + json.dumps(assets) + ';', sw, flags=re.M)
+if n1 != 1 or n2 != 1: fail('could not update VERSION/ASSETS in sw.js')
+with open(rel('sw.js'), 'w', encoding='utf-8') as f:
+    f.write(sw)
+print(f'ok: {len(texts)} texts ({", ".join(f"{k} {len(v["verses"])}" for k, v in texts.items())}), '
+      f'{len(assets)} precached files, sw VERSION {version}')
