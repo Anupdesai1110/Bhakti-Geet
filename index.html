@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>माझी स्तोत्रे</title>
-<meta name="description" content="रामरक्षा व भीमरूपी स्तोत्र — मोठ्या अक्षरांत, ऑफलाइन, जाहिरातमुक्त.">
+<meta name="description" content="रामरक्षा व भीमरूपी स्तोत्र — मोठ्या अक्षरांत, इंटरनेटशिवाय, जाहिरातींविना.">
 <meta name="theme-color" content="#FBF7EF" id="themeColor">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
@@ -26,10 +26,11 @@
         <section class="page" data-slot="next" aria-hidden="true"></section>
       </div>
       <div class="zones" id="zones">
-        <button type="button" class="zone" id="zPrev" aria-label="मागील पान"></button>
-        <button type="button" class="zone" id="zMid" aria-label="पर्याय दाखवा किंवा लपवा" aria-expanded="false"></button>
-        <button type="button" class="zone" id="zNext" aria-label="पुढील पान"></button>
+        <button type="button" class="zone" id="zPrev" aria-label="मागचे पान"></button>
+        <button type="button" class="zone" id="zMid" aria-label="बटणे दाखवा किंवा लपवा" aria-expanded="false"></button>
+        <button type="button" class="zone" id="zNext" aria-label="पुढचे पान"></button>
       </div>
+      <button type="button" class="cover-go" id="coverGo" hidden></button>
     </div>
     <div id="scroller" class="scroller" hidden></div>
     <div id="welcome" class="welcome" hidden>
@@ -40,17 +41,18 @@
   </main>
 
   <header class="bar top" id="topbar">
-    <button type="button" class="iconbtn" id="menuBtn" aria-label="स्तोत्रांची यादी" aria-haspopup="dialog" aria-controls="drawer">
+    <button type="button" class="iconbtn labeled" id="menuBtn" aria-haspopup="dialog" aria-controls="drawer">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>यादी</span>
     </button>
-    <button type="button" class="bartitle" id="barTitle" aria-label="स्तोत्रांची यादी उघडा"></button>
+    <button type="button" class="bartitle" id="barTitle" aria-label="यादी उघडा"></button>
     <button type="button" class="iconbtn labeled" id="settingsBtn" aria-haspopup="dialog" aria-controls="settings">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
-      <span>सेटिंग्ज</span>
+      <span>पर्याय</span>
     </button>
   </header>
 
-  <nav class="bar bottom" id="bottombar" aria-label="वाचन पर्याय">
+  <nav class="bar bottom" id="bottombar" aria-label="वाचनाची बटणे">
     <button type="button" class="act" id="reciteBtn">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
       <span>पारायण</span>
@@ -61,7 +63,7 @@
     </button>
     <button type="button" class="act" id="shareBtn">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 13v6h14v-6"/></svg>
-      <span>शेअर</span>
+      <span>पाठवा</span>
     </button>
     <span id="countHelp" class="sr">एक पूर्ण पठण झाल्यावर दाबा</span>
   </nav>
@@ -86,35 +88,39 @@
   <p class="recite-note" id="reciteNote" hidden></p>
 </div>
 
-<div id="hint" class="hint" hidden role="dialog" aria-label="वाचायचे कसे">
+<div id="hint" class="hint" hidden role="dialog" aria-label="पाने कशी उलटायची">
       <div class="hz"><span class="hl">‹</span><span>मागचे पान</span></div>
-      <div class="hz mid"><span class="hl">•</span><span>पर्याय दाखवा</span></div>
+      <div class="hz mid"><span class="hl">•</span><span>बटणे दाखवा</span></div>
       <div class="hz"><span class="hl">›</span><span>पुढचे पान</span></div>
-      <p class="hfoot">टॅप करा किंवा बोटाने पान डावीकडे-उजवीकडे सरकवा.<br><strong>सुरू करण्यासाठी कुठेही टॅप करा.</strong></p>
+      <p class="hfoot">पानाच्या उजव्या किंवा डाव्या भागावर स्पर्श करा, किंवा बोटाने पान बाजूला सरकवा.<br><strong>सुरू करण्यासाठी कुठेही स्पर्श करा.</strong></p>
     </div>
 <div class="scrim" id="scrim" hidden></div>
 
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
   <div class="drawer-head">
     <h2 class="app-name" id="drawerTitle" tabindex="-1">माझी स्तोत्रे</h2>
-    <button type="button" class="iconbtn" id="drawerClose" aria-label="यादी बंद करा">
+    <button type="button" class="iconbtn labeled" id="drawerClose">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      <span>बंद</span>
     </button>
   </div>
-  <div class="seg" role="group" aria-label="यादी कशी पाहायची">
-    <button type="button" id="browseGroup" aria-pressed="true">देव / संत</button>
-    <button type="button" id="browseLang" aria-pressed="false">भाषा</button>
-  </div>
-  <div class="dlist" id="dlist"></div>
-  <div class="dfoot">
-    <button type="button" class="drow" id="aboutBtn">माहिती व श्रेय</button>
+  <div class="dscroll" id="dscroll">
+    <div id="dcont"></div>
+    <div class="seg" role="group" aria-label="यादी कशी लावायची">
+      <button type="button" id="browseGroup" aria-pressed="true">देव व संत</button>
+      <button type="button" id="browseLang" aria-pressed="false">भाषा</button>
+    </div>
+    <div class="dlist" id="dlist"></div>
+    <div class="dfoot">
+      <button type="button" class="drow" id="aboutBtn">माहिती व श्रेय</button>
+    </div>
   </div>
 </aside>
 
 <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
   <div class="sheet-panel">
     <div class="sheet-head">
-      <h2 id="settingsTitle">सेटिंग्ज</h2>
+      <h2 id="settingsTitle">पर्याय</h2>
       <button type="button" class="iconbtn labeled" id="settingsClose"><span>बंद</span></button>
     </div>
 
@@ -122,59 +128,59 @@
       <h3 id="sizeH">अक्षरांचा आकार</h3>
       <p class="preview" id="preview" aria-hidden="true">श्रीराम जय राम जय जय राम</p>
       <div class="sizerow">
-        <button type="button" class="stepbtn" id="sizeDown" aria-label="अक्षरे लहान">अ−</button>
+        <button type="button" class="stepbtn" id="sizeDown" aria-label="अक्षरे लहान करा">अ−</button>
         <input type="range" id="sizeRange" min="20" max="56" step="1" value="34" aria-labelledby="sizeH" aria-valuetext="३४">
-        <button type="button" class="stepbtn big" id="sizeUp" aria-label="अक्षरे मोठी">अ+</button>
+        <button type="button" class="stepbtn big" id="sizeUp" aria-label="अक्षरे मोठी करा">अ+</button>
       </div>
       <p class="val" id="sizeVal">३४</p>
     </section>
 
     <section class="sec">
-      <h3>रंग</h3>
-      <div class="choices three" role="group" aria-label="रंग">
+      <h3 id="themeH">रंग</h3>
+      <div class="choices three" role="group" aria-labelledby="themeH">
         <button type="button" class="choice sw-paper" data-theme-choice="paper" aria-pressed="false">कागद</button>
-        <button type="button" class="choice sw-sepia" data-theme-choice="sepia" aria-pressed="false">सेपिया</button>
+        <button type="button" class="choice sw-sepia" data-theme-choice="sepia" aria-pressed="false">पोथी</button>
         <button type="button" class="choice sw-night" data-theme-choice="night" aria-pressed="false">रात्र</button>
       </div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="meaningSec">
       <h3>अर्थ</h3>
       <label class="switch"><input type="checkbox" id="meaningToggle"><span class="track-s" aria-hidden="true"></span><span class="lbl">मराठी अर्थ दाखवा</span></label>
-      <p class="note">अर्थ हा संगणकाने (AI) तयार केलेला मसुदा आहे; तज्ज्ञांची तपासणी अजून व्हायची आहे.</p>
+      <p class="note">अर्थ संगणकाने (AI) लिहिलेला कच्चा मसुदा आहे; जाणकारांनी तो अजून तपासलेला नाही.</p>
     </section>
 
     <section class="sec">
-      <h3>वाचण्याची पद्धत</h3>
-      <div class="choices two" role="group" aria-label="वाचण्याची पद्धत">
-        <button type="button" class="choice" data-mode-choice="page" aria-pressed="true">पान उलटणे</button>
-        <button type="button" class="choice" data-mode-choice="scroll" aria-pressed="false">खाली सरकवणे</button>
+      <h3 id="modeH">कसे वाचायचे</h3>
+      <div class="choices two" role="group" aria-labelledby="modeH">
+        <button type="button" class="choice" data-mode-choice="page" aria-pressed="true">पान उलटून</button>
+        <button type="button" class="choice" data-mode-choice="scroll" aria-pressed="false">खाली सरकवून</button>
       </div>
       <label class="switch"><input type="checkbox" id="motionToggle"><span class="track-s" aria-hidden="true"></span><span class="lbl">पान उलटताना हलकी हालचाल</span></label>
     </section>
 
     <section class="sec">
-      <h3 id="targetH">जप संकल्प</h3>
+      <h3 id="targetH">जपाचा संकल्प</h3>
       <div class="sizerow">
-        <button type="button" class="stepbtn" id="targetDown" aria-label="संकल्प कमी">−</button>
+        <button type="button" class="stepbtn" id="targetDown" aria-label="संकल्प कमी करा">−</button>
         <output class="bigval" id="targetVal" aria-labelledby="targetH">११</output>
-        <button type="button" class="stepbtn" id="targetUp" aria-label="संकल्प जास्त">+</button>
+        <button type="button" class="stepbtn" id="targetUp" aria-label="संकल्प वाढवा">+</button>
       </div>
-      <div class="chips" role="group" aria-label="पटकन निवडा">
+      <div class="chips" role="group" aria-label="लगेच निवडा">
         <button type="button" class="chip" data-target="1">१</button>
         <button type="button" class="chip" data-target="11">११</button>
         <button type="button" class="chip" data-target="21">२१</button>
         <button type="button" class="chip" data-target="108">१०८</button>
       </div>
       <p class="note" id="countNow"></p>
-      <button type="button" class="wide" id="countReset">या स्तोत्राची जप-संख्या शून्य करा</button>
+      <button type="button" class="wide" id="countReset">या स्तोत्राची मोजणी शून्य करा</button>
     </section>
 
     <section class="sec">
-      <h3>स्मरण</h3>
-      <p class="note strong">फोनवर ‘माझी स्तोत्रे’ बंद असताना ते स्वतःहून आठवण करू शकत नाही. आठवण हवी असल्यास फोनच्या कॅलेंडरमध्ये रोजची किंवा साप्ताहिक आठवण जोडा.</p>
+      <h3>आठवण</h3>
+      <p class="note strong">‘माझी स्तोत्रे’ बंद असताना फोनला स्वतःहून आठवण करून देऊ शकत नाही. रोज किंवा दर आठवड्याला आठवण हवी असेल, तर ती फोनच्या कॅलेंडरमध्ये जोडा.</p>
       <div class="remind">
-        <p class="rtitle">रामरक्षा — रोज सायंकाळी ७ वाजता</p>
+        <p class="rtitle">रामरक्षा — रोज संध्याकाळी ७ वाजता</p>
         <div class="rbtns">
           <a class="wide" id="gcalRR" target="_blank" rel="noopener">Google Calendar मध्ये जोडा</a>
           <a class="wide alt" href="reminders/ramraksha-daily-1900.ics" target="_blank" rel="noopener">iPhone / इतर कॅलेंडर</a>

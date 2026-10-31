@@ -5,7 +5,7 @@
  */
 'use strict';
 (() => {
-  const APP_VERSION = '2.0.0';
+  const APP_VERSION = '3.0.0';
   const STORE_KEY = 'bhakti.v2';
   const FONT_FAMILY = 'NotoSerifDevaSub';
   const SIZE_MIN = 20, SIZE_MAX = 56, SIZE_DEFAULT = 34;
@@ -24,7 +24,7 @@
   /* ------------------------------------------------------------------ state */
   const DEFAULTS = {
     v: 2, text: null, size: SIZE_DEFAULT, theme: null, meaning: false, motion: null, mode: 'page',
-    browse: 'group', target: 11, count: {}, anchor: {}, speed: 4, hintSeen: false,
+    browse: 'group', target: 11, count: {}, anchor: {}, speed: 4, hintSeen: false, recent: null,
   };
   const st = loadState();
 
@@ -43,6 +43,7 @@
     if (![null, 'paper', 'sepia', 'night'].includes(o.theme)) o.theme = null;
     if (![null, true, false].includes(o.motion)) o.motion = null;
     o.meaning = o.meaning === true;
+    if (typeof o.recent !== 'string') o.recent = null;
     return o;
   }
   function migrateV1() { // prototype key 'bhakti'
@@ -178,7 +179,7 @@
   }
 
   /* ---------------------------------------------------------- catalog/data */
-  let catalog = null, text = null, blocks = [], rows = [], rowH = [], pages = [], cur = 0;
+  let catalog = null, text = null, entry = null, blocks = [], rows = [], rowH = [], pages = [], cur = 0;
   let px = { fs: 34, mfs: 20, rgap: 10, mgap: 16, bgap: 29 };
   const textCache = {};
   async function loadJSON(url) {
@@ -187,13 +188,17 @@
     return r.json();
   }
   function buildBlocks(t) {
-    const B = [{ id: 'title', kind: 'title', title: t.title + (t.subtitle ? ` (${t.subtitle})` : ''), sub: t.author || '' }];
+    const B = [{ id: 'cover', kind: 'cover' }]; // page one: the cover (not counted by the indicator)
     for (const f of t.front || []) B.push({ id: f.id, kind: f.kind === 'verse' ? 'verse' : 'prose', label: f.label, lines: f.devanagari.split('\n') });
-    for (const v of t.verses) B.push({ id: 'v' + v.n, kind: 'verse', n: v.n, lines: v.devanagari.split('\n'), meaning: v.meaning_mr });
+    for (const v of t.verses) {
+      B.push({ id: 'v' + v.n, kind: 'verse', n: v.n, lines: v.devanagari.split('\n'), meaning: v.meaning_mr });
+      if (t.refrain && t.refrain.after === v.n) B.push({ id: 'refrain', kind: 'verse', refrain: true, label: 'ध्रुपद', lines: t.refrain.devanagari.split('\n') });
+    }
     for (const b of t.back || []) B.push({ id: b.id, kind: 'prose', label: b.label, lines: b.devanagari.split('\n') });
     return B;
   }
   function rowsFor(b, split) {
+    if (b.kind === 'cover') return [];
     if (b.kind === 'title') return [{ t: 'title', text: b.title }].concat(b.sub ? [{ t: 'sub', text: b.sub }] : []);
     const R = [];
     b.lines.forEach((line, li) => {
@@ -206,9 +211,12 @@
   }
   function blockHTML(b, R, from, to, spans) {
     const rs = R.slice(from, to);
+    // the cover is drawn by coverHTML(); here it is an empty placeholder so that measured
+    // .blk elements stay index-aligned with blocks[]
+    if (b.kind === 'cover') return '<div class="blk cover-ph" data-id="cover"></div>';
     if (b.kind === 'title') return `<header class="blk title" data-id="title">${rs.map((r) => `<span class="row ${r.t}">${esc(r.text)}</span>`).join('')}</header>`;
     const vr = rs.filter((r) => r.t === 'v'), mr = rs.filter((r) => r.t === 'm');
-    let h = `<article class="blk ${b.kind}" data-id="${esc(b.id)}">`;
+    let h = `<article class="blk ${b.kind}${b.refrain ? ' refrain' : ''}" data-id="${esc(b.id)}">`;
     if (vr.length) h += `<p class="vtext">${vr.map((r) => `<span class="row${r.gap ? ' gap' : ''}">${lineHTML(r.text, spans)}</span>`).join('')}</p>`;
     if (mr.length) h += `<div class="mean" lang="mr">${mr.map((r) => `<span class="row">${meaningHTML(r.text, r.first, spans)}</span>`).join('')}</div>`;
     return h + '</article>';
@@ -280,6 +288,7 @@
     const P = []; let curP = [], used = 0;
     const flush = () => { if (curP.length) P.push(curP); curP = []; used = 0; };
     for (let i = 0; i < blocks.length; i++) {
+      if (blocks[i].kind === 'cover') { flush(); P.push([{ i, from: 0, to: 0 }]); continue; } // always a page of its own
       const n = rows[i].length; if (!n) continue;
       const full = partHeight(i, 0, n), gap = curP.length ? px.bgap : 0;
       if (used + gap + full <= pageH) { curP.push({ i, from: 0, to: n }); used += gap + full; continue; }
@@ -301,9 +310,11 @@
     flush();
     return P;
   }
-  const pageHTML = (p) => `<div class="pbody" lang="${esc(text.lang)}">${p.map((part) => blockHTML(blocks[part.i], rows[part.i], part.from, part.to)).join('')}</div>`;
+  const isCover = (p) => !!(p && p.length && blocks[p[0].i] && blocks[p[0].i].kind === 'cover');
+  const pageHTML = (p) => (isCover(p) ? coverHTML(false)
+    : `<div class="pbody" lang="${esc(text.lang)}">${p.map((part) => blockHTML(blocks[part.i], rows[part.i], part.from, part.to)).join('')}</div>`);
   function pageLabel(p) {
-    if (!p) return '';
+    if (!p || isCover(p)) return ''; // the indicator does not count the cover
     const ns = [], labels = [];
     for (const part of p) { const b = blocks[part.i]; if (b.kind === 'verse' && b.n) { if (!ns.includes(b.n)) ns.push(b.n); } else if (b.label && !labels.includes(b.label)) labels.push(b.label); }
     const N = dn(text.verses.length);
@@ -325,6 +336,128 @@
     return Math.max(0, best);
   }
 
+  /* ---------------------------------------------------------------- cover */
+  const coverSVG = {};                       // path → inline SVG markup (our own files, precached)
+  let coverRow = false;                      // side-by-side layout for short, wide screens
+  const groupOf = (id) => (catalog && catalog.groups.find((g) => g.id === id)) || null;
+  const kindOf = (e) => (e && e.kind) || 'stotra';
+  const UNIT = { stotra: { one: 'श्लोक', many: 'श्लोक', gen: 'या स्तोत्राची', at: 'श्लोकावर' }, aarti: { one: 'कडवे', many: 'कडवी', gen: 'या आरतीची', at: 'कडव्यावर' } };
+  const unit = (e, k) => (UNIT[kindOf(e)] || UNIT.stotra)[k || 'one'];
+  let titleData = null; // covers/titles.json: calligraphic title lines as SVG outlines (Gotu, OFL), made at build time
+  async function loadTitles() {
+    if (titleData) return;
+    try { const r = await fetch('covers/titles.json'); titleData = r.ok ? await r.json() : { lines: {} }; } catch (err) { titleData = { lines: {} }; }
+  }
+  /** One cover-title line: the outline when we have it, otherwise plain text in the reading face. */
+  function titleLineHTML(line, lang) {
+    const t = titleData && titleData.lines && titleData.lines[line + '|' + lang];
+    if (!t) return `<span class="ln txt" aria-hidden="true">${esc(line)}</span>`;
+    const [x0, x1, y0, y1, d] = t, w = x1 - x0, h = y1 - y0; // font units, 1000 per em; the box holds all the ink
+    return `<svg class="ln" viewBox="${x0} ${y0} ${w} ${h}" width="${(w / 1000).toFixed(3)}em" height="${(h / 1000).toFixed(3)}em" aria-hidden="true" focusable="false"><path d="${d}"/></svg>`;
+  }
+  async function loadCoverArt(e) {
+    await loadTitles();
+    const g = groupOf(e && e.deity); const path = g && g.cover;
+    if (!path || coverSVG[path] !== undefined) return;
+    try {
+      const r = await fetch(path); const svg = await r.text();
+      coverSVG[path] = r.ok && /^<svg[\s>]/.test(svg.trim()) ? svg.trim() : '';
+    } catch (err) { coverSVG[path] = ''; } // offline before first cache: the cover shows text only
+  }
+  /** Where "continue" should go for a text, or null (nothing read yet, or already finished). */
+  function progressOf(id, total) {
+    const a = st.anchor[id]; const aid = a && a.id;
+    if (!aid || aid === 'cover') return null;
+    const m = /^v(\d+)$/.exec(aid);
+    if (m) { const n = +m[1]; return { anchor: a, n, total, done: n >= total }; }
+    if (aid === 'colophon') return { anchor: a, n: total, total, done: true };
+    return { anchor: a, n: 0, total, done: false };
+  }
+  function resumeTarget() {
+    if (!text) return null;
+    const p = progressOf(text.id, text.verses.length);
+    if (!p || p.done) return null;
+    const b = blocks.find((x) => x.id === p.anchor.id);
+    const where = p.n ? `${unit(entry)} ${dn(p.n)}` : (b && b.label ? `‘${b.label}’` : '');
+    return { anchor: p.anchor, label: where ? `${where} पासून पुढे वाचा` : 'जिथे थांबलात तिथून पुढे वाचा' };
+  }
+  function coverHTML(inScroll) {
+    const e = entry || {}; const g = groupOf(e.deity) || {};
+    const lines = e.cover_lines && e.cover_lines.length ? e.cover_lines : [text.title];
+    const art = (g.cover && coverSVG[g.cover]) || '';
+    const slot = !inScroll && resumeTarget() ? '<span class="cover-slot" aria-hidden="true"></span>' : '';
+    return `<div class="pbody cover${coverRow && !inScroll ? ' row' : ''}" data-id="cover">`
+      + (art ? `<div class="cover-art" role="img" aria-label="${esc(g.cover_label || g.name || '')}">${art}</div>` : '')
+      + '<div class="cover-text">' + (coverTrim < 1 || inScroll ? '<p class="cover-shri" aria-hidden="true">॥ श्री ॥</p>' : '')
+      + `<h1 class="cover-title" lang="${esc(text.lang)}" aria-label="${esc(text.title)}">${lines.map((l) => titleLineHTML(l, text.lang)).join('')}</h1>`
+      + (text.subtitle ? `<p class="cover-sub">${esc(text.subtitle)}</p>` : '')
+      + (text.author ? `<p class="cover-author">${esc(text.author)}</p>` : '')
+      + slot
+      + (inScroll || coverTrim >= 2 ? '' : '<p class="cover-hint">पुढे वाचण्यासाठी उजवीकडे स्पर्श करा&nbsp;›</p>')
+      + '</div></div>';
+  }
+  /** Size the cover for this page box so nothing is ever clipped, at any text size or orientation.
+   *  One scale factor for type, gaps and art is binary-searched; the decorative "॥ श्री ॥" and the
+   *  hint line are dropped only if even the smallest scale does not fit. */
+  let coverTrim = 0; // 0 = full cover, 1 = without ॥ श्री ॥, 2 = also without the hint
+  function fitCover(g) {
+    const meas = $('#measure'), r = document.documentElement.style;
+    const W = g.colW, H = g.pageH;
+    coverRow = g.W > g.H * 1.2 && g.H < 640;
+    const T0 = clamp(Math.round(st.size * 1.3), 34, 72), S0 = clamp(Math.round(st.size * 0.6), 17, 26);
+    const A0 = coverRow ? Math.min(Math.round(H * 0.86), Math.round(W * 0.4), 300) : Math.min(Math.round(W * 0.7), Math.round(H * 0.4), 300);
+    const G0 = clamp(Math.round(H * 0.02), 6, 16);
+    const resume = resumeTarget();
+    const apply = (k) => {
+      const title = Math.max(24, Math.round(T0 * k)), sub = Math.max(15, Math.round(S0 * Math.max(k, 0.8)));
+      const art = coverRow ? Math.max(64, Math.min(A0, Math.round(H * 0.86))) : Math.max(64, Math.round(A0 * k));
+      r.setProperty('--ctitle', title + 'px'); r.setProperty('--csub', sub + 'px'); r.setProperty('--cart', art + 'px');
+      r.setProperty('--cgap', Math.max(4, Math.round(G0 * k)) + 'px'); r.setProperty('--cbtn', Math.max(17, sub - 1) + 'px'); r.setProperty('--chint', Math.max(15, sub - 3) + 'px');
+      return art;
+    };
+    const fits = (k) => {
+      const art = apply(k);
+      meas.style.width = W + 'px'; meas.innerHTML = '';
+      const wrap = document.createElement('div'); // CSP: sizes go through the CSSOM, never as style attributes
+      wrap.style.height = H + 'px'; wrap.style.width = W + 'px'; wrap.innerHTML = coverHTML(false); meas.appendChild(wrap);
+      let go = null;
+      if (resume) { go = document.createElement('button'); go.className = 'cover-go'; go.style.position = 'static'; go.textContent = resume.label; meas.appendChild(go); }
+      const box = $('.pbody.cover', wrap);
+      if (go) { const gr = go.getBoundingClientRect(); r.setProperty('--cgo-w', Math.ceil(gr.width) + 'px'); r.setProperty('--cgo-h', Math.max(56, Math.ceil(gr.height)) + 'px'); }
+      // top-align while measuring, so all overflow shows up in scrollHeight (centred overflow hides half of it)
+      box.style.justifyContent = 'flex-start'; box.style.alignItems = 'flex-start';
+      const tall = Math.max(box.scrollHeight, ...$$(':scope > *', box).map((c) => Math.ceil(c.getBoundingClientRect().height)));
+      const textW = coverRow ? W - art - 2 * Math.max(4, Math.round(G0 * k)) : W;
+      const rng = document.createRange(); // width of the words themselves, without changing the layout
+      const linesFit = $$('.cover-title .ln', box).every((el) => { let w; if (el.tagName.toLowerCase() === 'svg') w = el.getBoundingClientRect().width; else { rng.selectNodeContents(el); w = rng.getBoundingClientRect().width; } return w <= textW + 0.5; });
+      const goFits = !go || go.getBoundingClientRect().width <= textW + 0.5;
+      return tall <= H && linesFit && goFits;
+    };
+    let best = null;
+    for (coverTrim = 0; coverTrim <= 2 && best === null; coverTrim++) {
+      if (fits(1)) { best = 1; break; }
+      let lo = 0.4, hi = 1;
+      if (!fits(lo)) continue;
+      for (let i = 0; i < 8; i++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+      best = lo; break;
+    }
+    if (best === null) { coverTrim = 2; best = 0.4; }
+    apply(best);
+    meas.innerHTML = '';
+  }
+  function updateCoverGo() {
+    const btn = $('#coverGo');
+    const onCover = st.mode === 'page' && !reciting && !busy && pages.length && isCover(pages[cur]) && $('#viewport').hidden === false;
+    const t = onCover ? resumeTarget() : null;
+    const slot = t ? $('.page[data-slot="cur"] .cover-slot') : null;
+    if (!slot) { btn.hidden = true; return; }
+    btn.textContent = t.label;
+    const vr = $('#viewport').getBoundingClientRect(), sr = slot.getBoundingClientRect();
+    btn.style.left = Math.round(sr.left - vr.left) + 'px'; btn.style.top = Math.round(sr.top - vr.top) + 'px';
+    btn.style.width = Math.ceil(sr.width) + 'px'; btn.style.height = Math.ceil(sr.height) + 'px';
+    btn.hidden = false;
+  }
+
   let layoutSeq = 0;
   async function relayout(anchor) {
     if (!text) return;
@@ -336,6 +469,7 @@
     lastGeom = g;
     setTypeVars(g.colW);
     measure(g);
+    fitCover(g);
     if (st.mode === 'page' && !reciting) {
       pages = pack(g.pageH);
       cur = clamp(pageOfAnchor(anchor), 0, Math.max(0, pages.length - 1));
@@ -344,6 +478,7 @@
     } else {
       pages = [];
       renderScroller(anchor);
+      updateCoverGo();
     }
   }
   let fontOK = false;
@@ -361,8 +496,10 @@
     const map = { prev: cur - 1, cur, next: cur + 1 };
     for (const [slot, idx] of Object.entries(map)) $(`.page[data-slot="${slot}"]`).innerHTML = (idx >= 0 && idx < pages.length) ? pageHTML(pages[idx]) : '';
     $('#pageno').textContent = pageLabel(pages[cur]);
-    const a = anchorOf(cur); if (a) { st.anchor[text.id] = a; save(); }
+    // the cover never overwrites the saved place, so "continue" survives a look at the cover
+    const a = anchorOf(cur); if (a && a.id !== 'cover') { st.anchor[text.id] = a; st.recent = text.id; save(); }
     if (controlsOn) prepareShare();
+    updateCoverGo();
   }
   function showPageView() { $('#viewport').hidden = false; $('#scroller').hidden = true; disconnectIO(); }
   let busy = false, edgeToastShown = false;
@@ -372,15 +509,16 @@
     hideHint();
     if (target < 0 || target >= pages.length) {
       snapBack();
-      if (!edgeToastShown) { toast(dir > 0 ? 'हे शेवटचे पान आहे' : 'हे पहिले पान आहे'); edgeToastShown = true; }
+      if (!edgeToastShown) { toast(dir > 0 ? 'हे शेवटचे पान आहे' : 'हे पहिले पान (मुखपृष्ठ) आहे'); edgeToastShown = true; }
       return;
     }
     const done = () => {
       cur = target;
       const tr = track(); tr.style.transition = 'none'; tr.style.transform = 'translate3d(0,0,0)';
-      renderSlots(); busy = false;
+      busy = false; renderSlots();
     };
     if (controlsOn) setControls(false);
+    $('#coverGo').hidden = true; // it lives outside the sliding pages
     if (!motionOn()) { done(); return; }
     busy = true;
     const tr = track();
@@ -393,8 +531,9 @@
   }
   function snapBack() {
     const tr = track();
-    if (!motionOn()) { tr.style.transition = 'none'; tr.style.transform = 'translate3d(0,0,0)'; return; }
+    if (!motionOn()) { tr.style.transition = 'none'; tr.style.transform = 'translate3d(0,0,0)'; updateCoverGo(); return; }
     tr.style.transition = 'transform 200ms ease-out'; tr.style.transform = 'translate3d(0,0,0)';
+    setTimeout(updateCoverGo, 220);
   }
   function go(i) { if (!pages.length) return; cur = clamp(i, 0, pages.length - 1); renderSlots(); }
 
@@ -412,7 +551,7 @@
       if (!decided) {
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
         decided = true; horiz = Math.abs(dx) > Math.abs(dy) * 1.2;
-        if (horiz) { try { vp.setPointerCapture(pid); } catch (_) { /* ignore */ } }
+        if (horiz) { $('#coverGo').hidden = true; try { vp.setPointerCapture(pid); } catch (_) { /* ignore */ } }
       }
       if (!horiz || !motionOn()) return;
       let d = dx;
@@ -435,6 +574,11 @@
     $('#zPrev').addEventListener('click', () => { if (suppressClick) return; if (controlsOn) { setControls(false); return; } turn(-1); });
     $('#zNext').addEventListener('click', () => { if (suppressClick) return; if (controlsOn) { setControls(false); return; } turn(1); });
     $('#zMid').addEventListener('click', () => { if (suppressClick) return; hideHint(); setControls(!controlsOn); });
+    $('#coverGo').addEventListener('click', () => {
+      if (suppressClick) return;
+      hideHint(); if (controlsOn) setControls(false);
+      const t = resumeTarget(); if (t) { $('#coverGo').hidden = true; go(pageOfAnchor(t.anchor)); $('#zMid').focus(); }
+    });
   }
 
   /* -------------------------------------------------- scroll + recitation */
@@ -442,7 +586,7 @@
   function disconnectIO() { if (io) { io.disconnect(); io = null; } }
   function renderScroller(anchor) {
     const sc = $('#scroller');
-    sc.innerHTML = `<div class="sbody" lang="${esc(text.lang)}">${blocks.map((b, i) => blockHTML(b, rows[i], 0, rows[i].length)).join('')}</div>`;
+    sc.innerHTML = `<div class="sbody" lang="${esc(text.lang)}">${blocks.map((b, i) => (b.kind === 'cover' ? coverHTML(true) : blockHTML(b, rows[i], 0, rows[i].length))).join('')}</div>`;
     $('#viewport').hidden = true; sc.hidden = false;
     const id = anchor && (anchor.id || anchor);
     const el = id ? sc.querySelector(`[data-id="${CSS.escape(id)}"]`) : null;
@@ -453,11 +597,11 @@
         for (const e of ents) {
           if (!e.isIntersecting) continue;
           const b = blocks.find((x) => x.id === e.target.dataset.id); if (!b) continue;
-          if (b.kind !== 'title') { st.anchor[text.id] = { id: b.id, f: 0 }; save(); }
-          $('#pageno').textContent = b.kind === 'verse' ? `${dn(b.n)} / ${dn(text.verses.length)}` : (b.label || text.short);
+          if (b.kind !== 'title' && b.kind !== 'cover') { st.anchor[text.id] = { id: b.id, f: 0 }; st.recent = text.id; save(); }
+          $('#pageno').textContent = b.kind === 'cover' ? '' : b.kind === 'verse' ? `${dn(b.n)} / ${dn(text.verses.length)}` : (b.label || text.short);
         }
       }, { root: sc, rootMargin: '-28% 0px -66% 0px', threshold: 0 });
-      $$('.blk', sc).forEach((el2) => io.observe(el2));
+      $$('.blk, .pbody.cover', sc).forEach((el2) => io.observe(el2));
     }
   }
   function bindScroller() {
@@ -500,7 +644,7 @@
     const dt = lastT ? Math.min(100, t - lastT) : 16; lastT = t;
     acc += (SPEED_LPM[st.speed - 1] * st.size * 1.9 / 60) * dt / 1000; // time-based, independent of 60/120 Hz
     if (acc >= 1) { const d = Math.floor(acc); acc -= d; sc.scrollTop += d; }   // whole pixels: Safari ignores fractional scrollTop
-    if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2) { setPlaying(false); toast('स्तोत्र पूर्ण झाले'); return; }
+    if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2) { setPlaying(false); toast(kindOf(entry) === 'aarti' ? 'आरती पूर्ण झाली' : 'स्तोत्र पूर्ण झाले'); return; }
     rafId = requestAnimationFrame(step);
   }
   async function requestWake() {
@@ -512,7 +656,7 @@
         note.hidden = true; return;
       }
     } catch (e) { /* not allowed or unsupported */ }
-    note.textContent = 'या फोनवर पारायणात स्क्रीन आपोआप बंद होऊ शकते.'; note.hidden = false;
+    note.textContent = 'या फोनवर पारायण चालू असताना स्क्रीन आपोआप बंद होऊ शकते.'; note.hidden = false;
     setTimeout(() => { note.hidden = true; }, 6000);
   }
   function releaseWake() { try { if (wakeLock) wakeLock.release(); } catch (e) { /* ignore */ } wakeLock = null; }
@@ -538,28 +682,29 @@
   function updateCount() {
     const c = text ? (st.count[text.id] || 0) : 0, s = `${dn(c)}/${dn(st.target)}`;
     $('#countLbl').textContent = s; $('#countLbl2').textContent = s;
-    const al = `जप मोजा: ${dn(c)} पैकी ${dn(st.target)} पूर्ण`;
+    const al = `जप मोजा: ${dn(st.target)} पैकी ${dn(c)} पूर्ण`;
     $('#countBtn').setAttribute('aria-label', al); $('#countBtn2').setAttribute('aria-label', al);
     $('#targetVal').textContent = dn(st.target);
-    $('#countNow').textContent = text ? `${text.short}: आतापर्यंत ${dn(c)} आवर्तने` : '';
+    $('#countNow').textContent = text ? `${text.short}: आतापर्यंत ${dn(c)} वेळा पूर्ण` : '';
   }
   function bump() {
     if (!text) return;
     const c = (st.count[text.id] || 0) + 1; st.count[text.id] = c; save(true); updateCount();
     try { if (navigator.vibrate) navigator.vibrate(c === st.target ? [60, 50, 60] : 25); } catch (e) { /* ignore */ }
-    toast(c === st.target ? `संकल्प पूर्ण — ${dn(c)} आवर्तने` : `जप: ${dn(c)} / ${dn(st.target)}`, c === st.target ? 4000 : 1500);
+    toast(c === st.target ? `संकल्प पूर्ण — ${dn(c)} वेळा` : `जप: ${dn(c)} / ${dn(st.target)}`, c === st.target ? 4000 : 1500);
   }
 
   /* ----------------------------------------------------------------- share */
   let shareCache = null;
   function shareBlock() {
     if (!text) return null;
+    const textual = (b) => b && b.kind !== 'title' && b.kind !== 'cover';
     if (st.mode === 'page' && !reciting && pages[cur]) {
-      const p = pages[cur].find((x) => blocks[x.i].kind === 'verse' && blocks[x.i].n) || pages[cur].find((x) => blocks[x.i].kind !== 'title');
+      const p = pages[cur].find((x) => blocks[x.i].kind === 'verse' && blocks[x.i].n) || pages[cur].find((x) => textual(blocks[x.i]));
       return p ? blocks[p.i] : null;
     }
     const a = st.anchor[text.id]; const b = blocks.find((x) => x.id === (a && a.id));
-    return b && b.kind !== 'title' ? b : null;
+    return textual(b) ? b : null;
   }
   function prepareShare() {
     const b = shareBlock(); if (!b) return;
@@ -574,7 +719,8 @@
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
   async function onShare() {
-    const b = shareBlock(); if (!b) return;
+    const b = shareBlock();
+    if (!b) { toast(`पाठवण्यासाठी आधी पान उलटून ${unit(entry, 'at')} या`); return; }
     const key = text.id + ':' + b.id;
     const ready = shareCache && shareCache.key === key ? shareCache.file : null;
     const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; } };
@@ -613,9 +759,11 @@
     x.fillStyle = '#2A1E14'; x.font = `${L.F}px "${FONT_FAMILY}", serif`;
     for (const l of L.lines) { x.fillText(l, W / 2, y); y += lh; }
     x.fillStyle = '#9A3A10'; x.font = `34px "${FONT_FAMILY}", serif`;
-    x.fillText(b.kind === 'verse' && b.n ? `श्लोक ${dn(b.n)}` : (b.label || ''), W / 2, H - 196);
+    x.fillText(b.kind === 'verse' && b.n ? `${unit(entry)} ${dn(b.n)}` : (b.label || ''), W / 2, H - 196);
     x.fillStyle = '#5B4936'; x.font = `26px "${FONT_FAMILY}", serif`;
-    x.fillText('मूळ पाठ: विकिस्रोत · CC BY-SA 4.0 · सुधारित', W / 2, H - 136);
+    // exact attribution for the base text: which wiki, the licence, and whether this text was corrected here
+    const site = /wikibooks/.test(text.source.site) ? 'विकिबुक्स' : 'विकिस्रोत';
+    x.fillText(`मूळ पाठ: ${site} · CC BY-SA 4.0${text.corrections.length ? ' · सुधारित' : ''}`, W / 2, H - 136);
     x.fillText('माझी स्तोत्रे', W / 2, H - 92);
     const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
     return new File([blob], `${text.id}-${b.n || b.id}.png`, { type: 'image/png' });
@@ -624,18 +772,35 @@
   /* --------------------------------------------------------- drawer/sheets */
   let lastFocus = null;
   const overlayOpen = () => !$('#drawer').hidden || !$('#settings').hidden || !$('#about').hidden;
+  /* Android Back closes the open menu or sheet instead of leaving the app. */
+  const ovStack = []; let ignorePop = 0;
+  function pushOverlay(id) { try { history.pushState({ ov: id }, ''); ovStack.push(id); } catch (e) { /* history unavailable */ } }
+  function dropOverlay(id) { // the overlay was closed by a button, scrim or Escape: remove its history entry
+    const i = ovStack.lastIndexOf(id); if (i < 0) return;
+    ovStack.splice(i, 1); ignorePop++;
+    try { history.back(); } catch (e) { ignorePop--; }
+  }
+  window.addEventListener('popstate', () => {
+    if (ignorePop > 0) { ignorePop--; return; }
+    const id = ovStack.pop(); if (!id) return;
+    if (id === 'drawer') closeDrawer(true); else closeSheet(id, true);
+  });
+
   function openDrawer() {
+    if (!$('#drawer').hidden) return;
     lastFocus = document.activeElement;
     renderDrawer();
     const d = $('#drawer'), s = $('#scrim');
-    d.hidden = false; s.hidden = false;
+    d.hidden = false; s.hidden = false; $('#dscroll').scrollTop = 0;
     requestAnimationFrame(() => { d.classList.add('open'); s.classList.add('show'); });
     $('#menuBtn').setAttribute('aria-expanded', 'true');
+    pushOverlay('drawer');
     setTimeout(() => $('#drawerTitle').focus(), motionOn() ? 60 : 0);
   }
-  function closeDrawer() {
+  function closeDrawer(viaBack) {
     const d = $('#drawer'), s = $('#scrim');
     if (d.hidden) return;
+    if (!viaBack) dropOverlay('drawer');
     d.classList.remove('open'); s.classList.remove('show');
     $('#menuBtn').setAttribute('aria-expanded', 'false');
     setTimeout(() => { d.hidden = true; s.hidden = true; }, motionOn() ? 240 : 0);
@@ -643,31 +808,70 @@
     if (!text && catalog && catalog.texts.length) openText(catalog.texts[0].id);
   }
   function restoreFocus() { const f = lastFocus; lastFocus = null; if (f && document.contains(f) && !f.closest('[inert]')) f.focus(); else $('#zMid').focus(); }
+  const langName = (id) => (catalog.languages.find((l) => l.id === id) || { name: id }).name;
+  const setBars = (root) => $$('.bar i[data-pct]', root).forEach((i) => { i.style.width = i.dataset.pct + '%'; }); // CSP: no inline style attributes
+  function progressHTML(t, p) {
+    if (!p) return '';
+    if (p.done) return '<span class="prog">पूर्ण वाचले ✓</span>';
+    const pct = Math.max(3, Math.round((p.n / Math.max(1, p.total)) * 100));
+    const words = p.n ? `${dn(p.total)} पैकी ${dn(p.n)} वाचले` : 'सुरुवात केली';
+    return `<span class="prog"><span class="bar" aria-hidden="true"><i data-pct="${pct}"></i></span><span>${words}</span></span>`;
+  }
+  function itemHTML(t, o) {
+    const now = text && t.id === text.id;
+    const p = progressOf(t.id, t.verses);
+    const kindTag = o && o.kindTag ? `<span class="kind">${kindOf(t) === 'aarti' ? 'आरती' : 'स्तोत्र'}</span>` : '';
+    const parts = [langName(t.lang), `${dn(t.verses)} ${unit(t, 'many')}`];
+    if (o && o.author && t.author) parts.push(t.author);
+    const line1 = t.subtitle ? `<span class="s">${esc(t.subtitle)}</span>` : '';
+    return `<button type="button" class="ditem" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
+      + `<span class="t" lang="${esc(t.lang)}">${esc(t.title)}</span>${line1}`
+      + `<span class="s">${kindTag}${esc(parts.join(' · '))}${now ? ' · <span class="now">आता उघडे आहे</span>' : ''}</span>`
+      + progressHTML(t, p) + '</button>';
+  }
+  function renderContinue() {
+    const box = $('#dcont');
+    const t = st.recent && catalog.texts.find((x) => x.id === st.recent);
+    const p = t && progressOf(t.id, t.verses);
+    if (!t || !p || p.done) { box.innerHTML = ''; return; }
+    const where = p.n ? `${unit(t)} ${dn(p.n)} पासून पुढे` : 'जिथे थांबलात तिथून पुढे';
+    box.innerHTML = `<button type="button" class="dcont" id="contBtn" data-id="${esc(t.id)}">`
+      + '<span class="k">पुढे वाचा</span>'
+      + `<span class="t" lang="${esc(t.lang)}">${esc(t.title)}</span>`
+      + `<span class="s">${esc(where)}</span>${progressHTML(t, p)}</button>`;
+    setBars(box);
+  }
   function renderDrawer() {
     const view = st.browse;
     $('#browseGroup').setAttribute('aria-pressed', String(view === 'group'));
     $('#browseLang').setAttribute('aria-pressed', String(view === 'lang'));
-    const langName = (id) => (catalog.languages.find((l) => l.id === id) || { name: id }).name;
-    const groupName = (id) => (catalog.groups.find((g) => g.id === id) || { name: id }).name;
-    const sections = view === 'group'
-      ? catalog.groups.map((g) => ({ title: g.name, items: catalog.texts.filter((t) => (t.groups || []).includes(g.id)) }))
-      : catalog.languages.map((l) => ({ title: l.name, items: catalog.texts.filter((t) => t.lang === l.id) }));
-    $('#dlist').innerHTML = sections.filter((s) => s.items.length).map((s) => `<section class="dgroup"><h3>${esc(s.title)}</h3>${s.items.map((t) => {
-      const sub = view === 'group' ? `${langName(t.lang)} · ${dn(t.verses)} श्लोक` : (t.groups || []).map(groupName).join(' · ');
-      const now = text && t.id === text.id;
-      return `<button type="button" class="ditem" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
-        + `<span class="t" lang="${esc(t.lang)}">${esc(t.title)}</span>`
-        + `<span class="s">${t.subtitle ? esc(t.subtitle) + ' · ' : ''}${esc(sub)}${now ? ' · <span class="now">आता वाचत आहात</span>' : ''}</span></button>`;
-    }).join('')}</section>`).join('');
+    renderContinue();
+    const sec = (title, inner) => (inner ? `<section class="dsec"><h3>${esc(title)}</h3>${inner}</section>` : '');
+    const grp = (g, items, o) => (items.length ? `<div class="dgroup"><h4>${esc(g.name)}</h4>${items.map((t) => itemHTML(t, o)).join('')}</div>` : '');
+    let html = '';
+    if (view === 'group') {
+      const inGroup = (g) => catalog.texts.filter((t) => (t.groups || []).includes(g.id));
+      const deities = catalog.groups.filter((g) => g.kind === 'deity'), saints = catalog.groups.filter((g) => g.kind === 'saint');
+      html += sec('स्तोत्रे', deities.map((g) => grp(g, inGroup(g).filter((t) => kindOf(t) === 'stotra'))).join(''));
+      // aartis: their own group, in catalog order; each item names its deity in its title
+      html += sec('आरत्या', catalog.texts.filter((t) => kindOf(t) === 'aarti').map((t) => itemHTML(t, { author: true })).join(''));
+      html += sec('संतांच्या रचना', saints.map((g) => grp(g, inGroup(g))).join(''));
+    } else {
+      html = catalog.languages.map((l) => sec(l.name, catalog.texts.filter((t) => t.lang === l.id).map((t) => itemHTML(t, { kindTag: true, author: true })).join(''))).join('');
+    }
+    $('#dlist').innerHTML = html;
+    setBars($('#dlist'));
   }
   function openSheet(id) {
     lastFocus = lastFocus || document.activeElement;
-    const s = $('#' + id); s.hidden = false;
+    const s = $('#' + id); if (!s.hidden) return;
+    s.hidden = false;
     if (id === 'settings') syncSettings();
     if (id === 'about') renderCredits();
+    pushOverlay(id);
     setTimeout(() => { const f = $('.sheet-head button', s); if (f) f.focus(); }, 0);
   }
-  function closeSheet(id) { const s = $('#' + id); if (s.hidden) return; s.hidden = true; restoreFocus(); }
+  function closeSheet(id, viaBack) { const s = $('#' + id); if (s.hidden) return; if (!viaBack) dropOverlay(id); s.hidden = true; restoreFocus(); }
   function closeTopOverlay() {
     if (!$('#about').hidden) closeSheet('about');
     else if (!$('#settings').hidden) closeSheet('settings');
@@ -698,11 +902,12 @@
     $$('[data-theme-choice]').forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.themeChoice === themeNow())));
     $$('[data-mode-choice]').forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.modeChoice === st.mode)));
     $('#meaningToggle').checked = st.meaning;
+    $('#meaningSec').hidden = !(text && text.verses.some((v) => v.meaning_mr)); // aartis have no meanings yet
     $('#motionToggle').checked = motionOn();
     updateCount();
     $('#gcalRR').href = gcalUrl('rr');
     $('#gcalBH').href = gcalUrl('bh');
-    resetArm = false; $('#countReset').textContent = 'या स्तोत्राची जप-संख्या शून्य करा';
+    resetArm = false; $('#countReset').textContent = resetLabel();
   }
   function setSize(v) {
     v = clamp(Math.round(v), SIZE_MIN, SIZE_MAX);
@@ -712,6 +917,7 @@
     relayout();
   }
   let resetArm = false, resetTimer = 0;
+  const resetLabel = () => `${unit(entry, 'gen')} मोजणी शून्य करा`;
   function gcalUrl(kind) {
     const now = new Date(), d = new Date(now), pad = (n) => String(n).padStart(2, '0');
     if (kind === 'bh') { d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7)); d.setHours(7, 0, 0, 0); if (d <= now) d.setDate(d.getDate() + 7); }
@@ -747,8 +953,8 @@
     $$('[data-target]').forEach((el) => el.addEventListener('click', () => setTarget(+el.dataset.target)));
     $('#countReset').addEventListener('click', (e) => {
       if (!text) return;
-      if (!resetArm) { resetArm = true; e.currentTarget.textContent = 'खात्री आहे? शून्य करण्यासाठी पुन्हा दाबा'; clearTimeout(resetTimer); resetTimer = setTimeout(() => { resetArm = false; $('#countReset').textContent = 'या स्तोत्राची जप-संख्या शून्य करा'; }, 5000); return; }
-      resetArm = false; st.count[text.id] = 0; save(true); updateCount(); $('#countReset').textContent = 'या स्तोत्राची जप-संख्या शून्य करा'; toast('जप-संख्या शून्य केली');
+      if (!resetArm) { resetArm = true; e.currentTarget.textContent = 'खरंच शून्य करायची? पुन्हा दाबा'; clearTimeout(resetTimer); resetTimer = setTimeout(() => { resetArm = false; $('#countReset').textContent = resetLabel(); }, 5000); return; }
+      resetArm = false; st.count[text.id] = 0; save(true); updateCount(); $('#countReset').textContent = resetLabel(); toast('मोजणी शून्य केली');
     });
   }
 
@@ -759,16 +965,21 @@
     const link = (href, label) => `<a href="${esc(href)}" target="_blank" rel="noopener">${label}</a>`;
     $('#credits').innerHTML = list.map((t) => {
       const added = t.corrections.filter((c) => c.kind === 'added');
+      const second = t.second_source;
       return `<h3 class="dev" lang="${esc(t.lang)}">${esc(t.title)}</h3>`
         + `<p>मूळ पाठ: ${link(t.source.url, esc(t.source.site + ' — ' + t.source.page))} (आवृत्ती ${esc(String(t.source.rev_id))}), ${esc(t.source.credit)}. परवाना: ${link(t.source.license_url, 'CC BY-SA 4.0')}.</p>`
-        + `<p>येथील पाठ सुधारित आहे: ${dn(t.corrections.length)} बदल. सुधारित पाठही CC BY-SA 4.0 अंतर्गत आहे.`
-        + (added.length ? ` विकिस्रोत आवृत्तीत नसलेला मजकूर इतर प्रकाशित पाठांवरून जोडला आहे (यादीत “जोडले”).` : '') + `</p>`
-        + `<details><summary>बदलांची यादी</summary><ol>${t.corrections.map((c) => `<li><span class="dev">${esc(c.where)}</span> ${c.kind === 'added' ? '(जोडले)' : ''}: <span class="dev">${esc(c.from)}</span> → <span class="dev">${esc(c.to)}</span></li>`).join('')}</ol></details>`;
+        + (second ? `<p>तुलनेसाठी दुसरा स्रोत: ${link(second.url, esc(second.name))}. ${esc(second.status)}.</p>` : '')
+        + (t.corrections.length ? `<p>येथील पाठ सुधारित आहे: ${dn(t.corrections.length)} बदल. सुधारित पाठही CC BY-SA 4.0 अंतर्गत आहे.` : '<p>पाठात शब्दांचा बदल केलेला नाही; फक्त विरामचिन्हे एकसारखी केली आहेत. पाठ CC BY-SA 4.0 अंतर्गत आहे.')
+        + (added.length ? ` मूळ आवृत्तीत नसलेला मजकूर इतर प्रकाशित पाठांवरून जोडला आहे (यादीत “जोडले”).` : '') + `</p>`
+        + `<p>मराठी जाणकाराकडून पाठाची तपासणी: ${t.review && t.review.native_marathi ? esc(t.review.native_marathi) : 'अजून झालेली नाही'}.</p>`
+        + (t.corrections.length ? `<details><summary>बदलांची यादी</summary><ol>${t.corrections.map((c) => `<li><span class="dev">${esc(c.where)}</span> ${c.kind === 'added' ? '(जोडले)' : ''}: <span class="dev">${esc(c.from)}</span> → <span class="dev">${esc(c.to)}</span></li>`).join('')}</ol></details>` : '');
     }).join('')
-      + '<h3>मराठी अर्थ</h3><p>अर्थ हा संगणकाने (AI) तयार केलेला <strong>मसुदा</strong> आहे; तज्ज्ञांची तपासणी झालेली नाही, म्हणून तो आपोआप दिसत नाही. यावर कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
+      + '<h3>मुखपृष्ठावरील चित्रे</h3><p>धनुष्य-बाण, गदा व इतर चिन्हे या ॲपसाठी नव्याने काढलेली मूळ चित्रे आहेत; देवतांची चित्रे मुद्दाम काढलेली नाहीत. कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
+      + `<h3>मुखपृष्ठावरील नावाची अक्षरे</h3><p>“Gotu” अक्षरशैलीवरून तयार केलेली अक्षरांची रेखाचित्रे — Gotu © 2016 Ek Type, परवाना: ${link('fonts/OFL-Gotu.txt', 'SIL Open Font License 1.1')}. फॉन्टची फाईल ॲपमध्ये नाही; फक्त या नावांची अक्षरे आहेत.</p>`
+      + '<h3>मराठी अर्थ</h3><p>अर्थ संगणकाने (AI) लिहिलेला कच्चा <strong>मसुदा</strong> आहे; जाणकारांनी तो अजून तपासलेला नाही, म्हणून तो आपोआप दिसत नाही. यावर कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
       + `<h3>अक्षरशैली (फॉन्ट)</h3><p>Noto Serif Devanagari — © 2022 The Noto Project Authors. परवाना: ${link('fonts/OFL.txt', 'SIL Open Font License 1.1')}. येथे नियमित (Regular) वजनाचा, देवनागरीपुरता लहान केलेला संच (WOFF2).</p>`
       + '<h3>गोपनीयता</h3><p>खाते नाही, जाहिराती नाहीत, वापराचे मोजमाप (analytics) नाही, ध्वनी नाही. सेटिंग्ज, शेवटचे पान व जप-संख्या फक्त या फोनवर साठवली जाते. “Google Calendar” बटण दाबले तरच Google चे पान उघडते.</p>'
-      + `<h3>ऑफलाइन</h3><p id="offlineState">${offlineText()}</p>`
+      + `<h3>इंटरनेटशिवाय वापर</h3><p id="offlineState">${offlineText()}</p>`
       + `<p class="note">आवृत्ती ${esc(APP_VERSION)}</p>`;
   }
 
@@ -808,20 +1019,22 @@
   });
 
   /* ---------------------------------------------------------------- boot */
-  async function openText(id) {
-    const entry = catalog.texts.find((t) => t.id === id);
-    if (!entry) return;
+  async function openText(id, opts) {
+    const e = catalog.texts.find((t) => t.id === id);
+    if (!e) return;
     let t;
-    try { t = textCache[id] || (textCache[id] = await loadJSON(entry.file)); }
-    catch (e) { toast('हे स्तोत्र उघडता आले नाही. एकदा इंटरनेट सुरू करून पुन्हा उघडा.', 4000); return; }
+    try { t = textCache[id] || (textCache[id] = await loadJSON(e.file)); }
+    catch (err) { toast('हे उघडता आले नाही. एकदा इंटरनेट सुरू करून पुन्हा उघडा.', 4000); return; }
     if (reciting) { setPlaying(false); reciting = false; document.body.classList.remove('reciting'); $('#recitebar').hidden = true; releaseWake(); }
-    text = t; st.text = id; save();
-    blocks = buildBlocks(t); pages = []; shareCache = null;
+    await loadCoverArt(e);
+    text = t; entry = e; st.text = id; save();
+    blocks = buildBlocks(t); pages = []; shareCache = null; edgeToastShown = false;
     $('#welcome').hidden = true;
     document.title = `${t.short} · माझी स्तोत्रे`;
     const bt = $('#barTitle'); bt.textContent = t.title; bt.setAttribute('lang', t.lang);
     updateCount();
-    await relayout(st.anchor[id] || null);
+    // from the list: start at the cover (it offers "continue"); on app start: back to the saved place
+    await relayout(opts && opts.cover ? { id: 'cover', f: 0 } : (st.anchor[id] || null));
     if (!st.hintSeen && st.mode === 'page') showHint();
   }
   function bindUI() {
@@ -833,16 +1046,24 @@
     $('#scrim').addEventListener('click', closeDrawer);
     $('#browseGroup').addEventListener('click', () => { st.browse = 'group'; save(); renderDrawer(); });
     $('#browseLang').addEventListener('click', () => { st.browse = 'lang'; save(); renderDrawer(); });
-    $('#dlist').addEventListener('click', (e) => {
-      const b = e.target.closest('.ditem'); if (!b) return;
-      const id = b.dataset.id;
+    const pick = (id, how) => {
       lastFocus = null;
-      $('#drawer').classList.remove('open'); $('#scrim').classList.remove('show');
-      setTimeout(() => { $('#drawer').hidden = true; $('#scrim').hidden = true; }, motionOn() ? 240 : 0);
+      dropOverlay('drawer');
+      const d = $('#drawer'), sc = $('#scrim');
+      d.classList.remove('open'); sc.classList.remove('show');
+      setTimeout(() => { d.hidden = true; sc.hidden = true; }, motionOn() ? 240 : 0);
       $('#menuBtn').setAttribute('aria-expanded', 'false');
-      if (!text || id !== text.id) openText(id); else setControls(false);
+      const same = text && id === text.id;
+      if (how === 'resume') {
+        if (!same) openText(id);
+        else if (st.mode === 'page' && !reciting) { setControls(false); go(pageOfAnchor(st.anchor[id])); }
+        else relayout(st.anchor[id]);
+      } else if (!same) openText(id, { cover: true });
+      else setControls(false);
       $('#zMid').focus();
-    });
+    };
+    $('#dlist').addEventListener('click', (e) => { const b = e.target.closest('.ditem'); if (b) pick(b.dataset.id); });
+    $('#dcont').addEventListener('click', (e) => { const b = e.target.closest('.dcont'); if (b) pick(b.dataset.id, 'resume'); });
     $('#aboutBtn').addEventListener('click', () => openSheet('about'));
     $('#settingsBtn').addEventListener('click', () => openSheet('settings'));
     $('#settingsClose').addEventListener('click', () => closeSheet('settings'));
@@ -891,7 +1112,10 @@
       const standalone = media('(display-mode: standalone)').matches || navigator.standalone === true;
       if (standalone && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
     } catch (e) { /* ignore */ }
-    try { catalog = await loadJSON('data/catalog.json'); }
+    try {
+      catalog = await loadJSON('data/catalog.json');
+      catalog.texts = catalog.texts.filter((t) => t.live !== false); // staged for a later release: not shown
+    }
     catch (e) {
       $('#welcome').hidden = false;
       $('.welcome-sub').textContent = 'पहिल्यांदा उघडण्यासाठी इंटरनेट लागते. इंटरनेट सुरू करून पुन्हा उघडा.';

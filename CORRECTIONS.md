@@ -1,6 +1,6 @@
 # दुरुस्त्या व पाठभेद (Corrections and variants)
 
-Policy: the Wikisource revision is the base text. A reading is changed only when it is a clear error
+Policy: the pinned wiki revision (Wikisource for the stotras, Wikibooks for the aartis) is the base text. A reading is changed only when it is a clear error
 (typo, broken word, grammar, metre) **and** the corrected reading is attested in at least one other source.
 Readings where sources merely differ are recorded as variants and left unchanged for the human reviewer.
 This file is generated from `data/*.json` by `tools_build_data.py`.
@@ -8,6 +8,8 @@ This file is generated from `data/*.json` by `tools_build_data.py`.
 ## श्रीरामरक्षास्तोत्रम् (ramraksha)
 
 Base: [sa.wikisource.org — रामरक्षास्तोत्रम्](https://sa.wikisource.org/w/index.php?oldid=403980), revision 403980, विकिस्रोत योगदानकर्ते (Wikisource contributors), CC BY-SA 4.0. Corrected text: CC BY-SA 4.0. Meanings: CC0 1.0 (AI draft, unreviewed).
+
+Native Marathi reader review: not reviewed.
 
 | # | where | before | after | kind | basis | sources | status | in |
 |---|---|---|---|---|---|---|---|---|
@@ -79,6 +81,8 @@ Sources:
 ## भीमरूपी स्तोत्र (bhimrupi)
 
 Base: [mr.wikisource.org — चतुर्दश मारूती स्तोत्रे — स्तोत्र १](https://mr.wikisource.org/w/index.php?oldid=156943), revision 156943, विकिस्रोत योगदानकर्ते (Wikisource contributors), CC BY-SA 4.0. Corrected text: CC BY-SA 4.0. Meanings: CC0 1.0 (AI draft, unreviewed).
+
+Native Marathi reader review: not reviewed.
 
 | # | where | before | after | kind | basis | sources | status | in |
 |---|---|---|---|---|---|---|---|---|

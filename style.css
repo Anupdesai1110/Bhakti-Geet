@@ -10,6 +10,9 @@
   --rule: #E3D7C3; --chip: #F2EADB; --scrim: rgba(35, 24, 12, .42);
   --shadow: 0 1px 2px rgba(60, 40, 20, .08), 0 6px 20px rgba(60, 40, 20, .10);
   --serif: "NotoSerifDevaSub", "Noto Serif Devanagari", "Tiro Devanagari Marathi", "Kohinoor Devanagari", serif;
+  /* cover titles are SVG outlines (covers/titles.json); a line without an outline falls back to this face */
+  --display: "NotoSerifDevaSub", "Noto Serif Devanagari", serif;
+  --sun: #E2A23B; /* cover art: sun disc and other warm second colour */
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", "Kohinoor Devanagari", "Mangal", sans-serif;
   /* typographic scale: set from JS (px) so measuring and rendering always agree */
   --fs: 34px; --mfs: 21px; --tfs: 21px; --afs: 15px; --lh: 1.9; --mlh: 1.7;
@@ -20,11 +23,19 @@
 }
 html[data-theme="sepia"] {
   --bg: #F1E3C6; --surface: #F7ECD6; --ink: #30210E; --ink2: #5A4426; --accent: #87340C;
-  --rule: #D9C59F; --chip: #EAD8B4; --scrim: rgba(40, 26, 8, .45);
+  --rule: #D9C59F; --chip: #EAD8B4; --scrim: rgba(40, 26, 8, .45); --sun: #D69A35;
+  /* "पोथी" paper (reading page only). Lighter than --bg in the middle and never darker than --bg
+     where text can sit, so text contrast can only go up. Edge shading stays in the outer 14 px,
+     which is inside the page margin (the text column keeps at least 16 px from each edge). */
+  --paper: radial-gradient(125% 95% at 50% 44%, #F7EDD7 0%, #F4E8CF 42%, #F1E3C6 100%);
+  --paper-edges:
+    linear-gradient(90deg, rgba(92, 60, 20, .20) 0, rgba(92, 60, 20, .08) 4px, rgba(92, 60, 20, 0) 14px) left top / 14px 100% no-repeat,
+    linear-gradient(270deg, rgba(92, 60, 20, .14) 0, rgba(92, 60, 20, .05) 2px, rgba(92, 60, 20, 0) 9px) right top / 9px 100% no-repeat,
+    repeating-linear-gradient(270deg, rgba(92, 60, 20, .10) 0 1px, rgba(92, 60, 20, 0) 1px 3px) right top / 7px 100% no-repeat;
 }
 html[data-theme="night"] {
   --bg: #14110E; --surface: #1F1A16; --ink: #EDE3D1; --ink2: #BBAC95; --accent: #E9A866;
-  --rule: #3B3229; --chip: #2B241E; --scrim: rgba(0, 0, 0, .6);
+  --rule: #3B3229; --chip: #2B241E; --scrim: rgba(0, 0, 0, .6); --sun: #8A5A1E;
   --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 6px 20px rgba(0, 0, 0, .45);
   color-scheme: dark;
 }
@@ -32,7 +43,7 @@ html[data-theme="night"] {
 @media (prefers-color-scheme: dark) {
   html:not([data-theme]) {
     --bg: #14110E; --surface: #1F1A16; --ink: #EDE3D1; --ink2: #BBAC95; --accent: #E9A866;
-    --rule: #3B3229; --chip: #2B241E; color-scheme: dark;
+    --rule: #3B3229; --chip: #2B241E; --sun: #8A5A1E; color-scheme: dark;
   }
 }
 
@@ -60,6 +71,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 }
 .page[data-slot="prev"] { transform: translate3d(-100%, 0, 0); }
 .page[data-slot="next"] { transform: translate3d(100%, 0, 0); }
+/* पोथी (sepia) only: soft paper tone and page-edge shading. CSS gradients only, no images, no motion. */
+html[data-theme="sepia"] .reader, html[data-theme="sepia"] .page { background: var(--paper-edges), var(--paper) var(--bg); }
 .pbody { width: var(--colW); max-width: 100%; }
 .zones { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; }
 .zone {
@@ -86,6 +99,12 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .vtext .row { display: block; }
 .vtext .row.gap:not(:first-child) { margin-top: var(--rgap); }
 .vn { color: var(--accent); }
+/* aarti refrain (ध्रुपद): set apart by thin rules drawn in the gaps between blocks.
+   The rules are absolutely positioned, so they never change a block's measured height (pages are packed from measurements). */
+.blk.refrain { position: relative; }
+.blk.refrain::before, .blk.refrain::after { content: ""; position: absolute; left: 18%; right: 18%; height: 1px; background: var(--rule); }
+.blk.refrain::before { top: calc(var(--bgap) * -0.5); }
+.blk.refrain::after { bottom: calc(var(--bgap) * -0.5); }
 .title .row { display: block; text-align: center; }
 .title .row.title { font-size: var(--tfs); line-height: 1.6; color: var(--accent); }
 .title .row.sub { font-family: var(--sans); font-size: var(--afs); line-height: 1.5; color: var(--ink2); }
@@ -100,6 +119,46 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   padding: .28em .6em; margin-inline-end: .45em; border: 1px solid currentColor; border-radius: 999px;
   color: var(--accent); vertical-align: .16em;
 }
+
+/* ---------- cover (page one of every text; not counted by the page indicator) ---------- */
+.pbody.cover {
+  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--cgap, 12px); text-align: center; overflow: hidden;
+}
+.cover-art { flex: 0 1 auto; width: var(--cart, 240px); height: var(--cart, 240px); min-width: 64px; min-height: 64px; }
+.cover-art svg { display: block; width: 100%; height: 100%; }
+.cover-text { display: flex; flex-direction: column; align-items: center; gap: calc(var(--cgap, 12px) * .6); min-width: 0; max-width: 100%; }
+.cover-shri { margin: 0; font-family: var(--serif); font-size: var(--csub, 20px); line-height: 1.4; color: var(--accent); }
+.cover-title { margin: 0; font-family: var(--display); font-weight: 400; font-size: var(--ctitle, 44px); line-height: 1.32; color: var(--ink); }
+.cover-title .ln { display: block; margin: 0 auto; white-space: nowrap; }
+.cover-title svg.ln { overflow: visible; }
+.cover-title svg.ln path { fill: currentColor; }
+.cover-title svg.ln + .ln { margin-top: .2em; }
+.pbody.cover.row .cover-title .ln { margin: 0; }
+.cover-sub, .cover-author { margin: 0; font-family: var(--serif); font-size: var(--csub, 20px); line-height: 1.5; }
+.cover-sub { color: var(--ink2); }
+.cover-author { color: var(--accent); }
+/* The "continue" button is drawn over an empty slot in the cover. It lives outside the sliding pages,
+   above the tap zones, so the zones keep working (and keep their focus ring) everywhere else. */
+.cover-slot { display: block; width: var(--cgo-w, 240px); height: var(--cgo-h, 56px); margin-top: 4px; }
+.cover-go {
+  position: absolute; z-index: 3; left: 0; top: 0; margin: 0; padding: 6px 18px;
+  border: 2px solid var(--accent); border-radius: 16px; background: var(--surface); color: var(--accent);
+  font-family: var(--sans); font-size: var(--cbtn, 19px); line-height: 1.35; cursor: pointer; white-space: nowrap;
+}
+.cover-go:active { background: var(--chip); }
+.cover-hint { margin: 0; font-size: var(--chint, 16px); line-height: 1.5; color: var(--ink2); }
+.pbody.cover.row { flex-direction: row; text-align: start; gap: calc(var(--cgap, 12px) * 2); }
+.pbody.cover.row .cover-text { align-items: flex-start; }
+/* the art's colours follow the theme */
+.emblem .e-main { fill: var(--accent); }
+.emblem .e-mainline { stroke: var(--accent); }
+.emblem .e-line { stroke: var(--ink2); }
+.emblem .e-soft { stroke: var(--rule); }
+.emblem .e-sun { fill: var(--sun); stroke: var(--sun); }
+.emblem .e-cut { stroke: var(--bg); }
+/* scroll mode and recitation show the cover as a smaller block at the top */
+.sbody .pbody.cover { height: auto; padding: 8px 0 24px; }
 
 /* ---------- page indicator, hint, welcome ---------- */
 .pageno {
@@ -177,28 +236,43 @@ body.reciting .bar.top, body.reciting .bar.bottom { visibility: hidden; }
 .scrim { position: fixed; inset: 0; z-index: 40; background: var(--scrim); opacity: 0; transition: opacity .22s ease; }
 .scrim.show { opacity: 1; }
 .drawer {
-  position: fixed; z-index: 41; top: 0; bottom: 0; left: 0; width: min(88vw, 400px);
+  position: fixed; z-index: 41; top: 0; bottom: 0; left: 0; width: min(92vw, 440px);
   display: flex; flex-direction: column; background: var(--surface); box-shadow: var(--shadow);
   padding: var(--sat) 0 var(--sab) var(--sal); transform: translate3d(-104%, 0, 0); transition: transform .24s ease;
 }
 .drawer.open { transform: none; }
-.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px 0 20px; }
-.app-name { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 28px; color: var(--accent); }
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 10px 16px 6px; padding: 4px; border-radius: 14px; background: var(--bg); border: 1px solid var(--rule); }
-.seg button { min-height: 48px; border: 0; border-radius: 10px; background: transparent; color: var(--ink2); font-size: 18px; }
-.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .16); font-weight: 600; }
-.dlist { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 10px 16px; }
-.dgroup h3 { margin: 18px 10px 4px; font-size: 17px; font-weight: 600; color: var(--ink2); }
-.ditem {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-height: 64px;
-  margin: 2px 0; padding: 10px 14px; border: 0; border-radius: 14px; background: transparent; color: var(--ink); text-align: start;
+.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 6px 20px; border-bottom: 1px solid var(--rule); }
+.app-name { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1.4; color: var(--accent); }
+.dscroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 12px 12px 20px; }
+/* continue card: the one thing most readers want, first and biggest */
+.dcont {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; min-height: 96px; margin: 0 0 14px;
+  padding: 12px 16px 14px; border: 2px solid var(--accent); border-radius: 18px; background: var(--bg); color: var(--ink); text-align: start; cursor: pointer;
 }
-.ditem .t { font-family: var(--serif); font-size: 25px; line-height: 1.45; }
-.ditem .s { font-size: 15px; line-height: 1.45; color: var(--ink2); }
+.dcont .k { font-size: 16px; line-height: 1.4; color: var(--accent); font-weight: 600; }
+.dcont .t { font-family: var(--serif); font-size: 25px; line-height: 1.45; }
+.dcont .s { font-size: 17px; line-height: 1.45; color: var(--ink2); }
+.dcont:active { background: var(--chip); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 0 6px; padding: 4px; border-radius: 14px; background: var(--bg); border: 1px solid var(--rule); }
+.seg button { min-height: 52px; border: 0; border-radius: 10px; background: transparent; color: var(--ink2); font-size: 18px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .16); font-weight: 600; }
+.dsec > h3 { margin: 22px 6px 2px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--accent); }
+.dgroup > h4 { margin: 14px 8px 2px; font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--ink2); }
+.ditem {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; min-height: 68px;
+  margin: 2px 0; padding: 10px 12px; border: 0; border-radius: 14px; background: transparent; color: var(--ink); text-align: start; cursor: pointer;
+}
+.ditem .t { font-family: var(--serif); font-size: 24px; line-height: 1.45; }
+.ditem .s { font-size: 16px; line-height: 1.45; color: var(--ink2); }
+.ditem .kind { display: inline-block; margin-inline-end: 6px; padding: 0 8px; border: 1px solid var(--rule); border-radius: 999px; font-size: 14px; line-height: 1.6; color: var(--ink2); }
 .ditem[aria-current="true"] { background: var(--chip); box-shadow: inset 4px 0 0 var(--accent); }
-.ditem .now { color: var(--accent); }
-.dfoot { border-top: 1px solid var(--rule); padding: 6px 10px; }
-.drow { display: flex; align-items: center; width: 100%; min-height: 52px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); font-size: 18px; text-align: start; }
+.ditem .now { color: var(--accent); font-weight: 600; }
+/* reading progress: a quiet bar plus the words, so it never relies on colour alone */
+.prog { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 2px; font-size: 15px; line-height: 1.4; color: var(--ink2); }
+.prog .bar { flex: 1; max-width: 160px; height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; }
+.prog .bar i { display: block; height: 100%; background: var(--accent); }
+.dfoot { margin-top: 18px; border-top: 1px solid var(--rule); padding-top: 6px; }
+.drow { display: flex; align-items: center; width: 100%; min-height: 56px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); font-size: 18px; text-align: start; }
 
 /* ---------- sheets ---------- */
 .sheet { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: var(--scrim); }
