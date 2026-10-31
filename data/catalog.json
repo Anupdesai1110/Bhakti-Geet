@@ -1,5 +1,5 @@
 {
- "schema": 1,
+ "schema": 2,
  "app": {
   "name": "माझी स्तोत्रे",
   "short_name": "स्तोत्रे"
@@ -8,12 +8,16 @@
   {
    "id": "ram",
    "kind": "deity",
-   "name": "श्रीराम"
+   "name": "श्रीराम",
+   "cover": "covers/ram.svg",
+   "cover_label": "श्रीरामांचे धनुष्य-बाण"
   },
   {
    "id": "hanuman",
    "kind": "deity",
-   "name": "हनुमान (मारुती)"
+   "name": "मारुती (हनुमान)",
+   "cover": "covers/hanuman.svg",
+   "cover_label": "मारुतीची गदा व उगवता सूर्य"
   },
   {
    "id": "ramdas",
@@ -38,29 +42,41 @@
  "texts": [
   {
    "id": "ramraksha",
+   "kind": "stotra",
    "file": "data/ramraksha.json",
    "title": "श्रीरामरक्षास्तोत्रम्",
    "short": "रामरक्षा",
    "lang": "sa",
+   "deity": "ram",
    "groups": [
     "ram"
    ],
    "author": "बुधकौशिक ऋषी",
-   "verses": 38
+   "verses": 38,
+   "cover_lines": [
+    "श्रीरामरक्षा",
+    "स्तोत्रम्"
+   ]
   },
   {
    "id": "bhimrupi",
+   "kind": "stotra",
    "file": "data/bhimrupi.json",
    "title": "भीमरूपी स्तोत्र",
    "subtitle": "मारुती स्तोत्र",
    "short": "भीमरूपी",
    "lang": "mr",
+   "deity": "hanuman",
    "groups": [
     "hanuman",
     "ramdas"
    ],
    "author": "समर्थ रामदास",
-   "verses": 17
+   "verses": 17,
+   "cover_lines": [
+    "भीमरूपी",
+    "स्तोत्र"
+   ]
   }
  ]
 }
