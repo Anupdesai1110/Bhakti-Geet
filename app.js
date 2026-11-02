@@ -5,7 +5,7 @@
  */
 'use strict';
 (() => {
-  const APP_VERSION = '3.1.0';
+  const APP_VERSION = '3.2.0';
   const STORE_KEY = 'bhakti.v2';
   const FONT_FAMILY = 'NotoSerifDevaSub';
   const SIZE_MIN = 20, SIZE_MAX = 56, SIZE_DEFAULT = 34;
@@ -24,7 +24,7 @@
   /* ------------------------------------------------------------------ state */
   const DEFAULTS = {
     v: 2, text: null, size: SIZE_DEFAULT, theme: null, meaning: false, motion: null, mode: 'page',
-    browse: 'group', target: 11, count: {}, anchor: {}, speed: 4, hintSeen: false, recent: null,
+    target: 11, count: {}, anchor: {}, speed: 4,
   };
   const st = loadState();
 
@@ -39,11 +39,9 @@
     if (!o.count || typeof o.count !== 'object') o.count = {};
     if (!o.anchor || typeof o.anchor !== 'object') o.anchor = {};
     if (!['page', 'scroll'].includes(o.mode)) o.mode = 'page';
-    if (!['group', 'lang'].includes(o.browse)) o.browse = 'group';
     if (![null, 'paper', 'sepia', 'night'].includes(o.theme)) o.theme = null;
     if (![null, true, false].includes(o.motion)) o.motion = null;
     o.meaning = o.meaning === true;
-    if (typeof o.recent !== 'string') o.recent = null;
     return o;
   }
   function migrateV1() { // prototype key 'bhakti'
@@ -394,7 +392,7 @@
       + (text.subtitle ? `<p class="cover-sub">${esc(text.subtitle)}</p>` : '')
       + (text.author ? `<p class="cover-author">${esc(text.author)}</p>` : '')
       + slot
-      + (inScroll || coverTrim >= 2 ? '' : '<p class="cover-hint">पुढे वाचण्यासाठी उजवीकडे स्पर्श करा&nbsp;›</p>')
+      + (inScroll || coverTrim >= 2 ? '' : '<p class="cover-hint" aria-hidden="true">›</p>')
       + '</div></div>';
   }
   /** Size the cover for this page box so nothing is ever clipped, at any text size or orientation.
@@ -498,20 +496,18 @@
     for (const [slot, idx] of Object.entries(map)) $(`.page[data-slot="${slot}"]`).innerHTML = (idx >= 0 && idx < pages.length) ? pageHTML(pages[idx]) : '';
     setPlace(pageLabel(pages[cur]));
     // the cover never overwrites the saved place, so "continue" survives a look at the cover
-    const a = anchorOf(cur); if (a && a.id !== 'cover') { st.anchor[text.id] = a; st.recent = text.id; save(); }
+    const a = anchorOf(cur); if (a && a.id !== 'cover') { st.anchor[text.id] = a; save(); }
     if (controlsOn) prepareShare();
     updateCoverGo();
   }
   function showPageView() { $('#viewport').hidden = false; $('#scroller').hidden = true; disconnectIO(); }
-  let busy = false, edgeToastShown = false;
+  let busy = false;
   function turn(dir, viaDrag) {
     if (busy || !pages.length) return;
     const target = cur + dir;
-    hideHint();
     if (controlsOn) setControls(false);
     if (target < 0 || target >= pages.length) {
       snapBack();
-      if (!edgeToastShown) { toast(dir > 0 ? 'हे शेवटचे पान आहे' : 'हे पहिले पान (मुखपृष्ठ) आहे'); edgeToastShown = true; }
       return;
     }
     const done = () => {
@@ -572,20 +568,13 @@
     };
     vp.addEventListener('pointerup', (e) => finish(e, false));
     vp.addEventListener('pointercancel', (e) => finish(e, true));
-    // A side tap always turns the page, also while the bar or the first-time hint is showing
-    // (turn() hides both). Only the middle shows or hides the bar.
+    // A side tap always turns the page, also while the bar is showing. Only the middle shows or hides the bar.
     $('#zPrev').addEventListener('click', () => { if (!suppressClick) turn(-1); });
     $('#zNext').addEventListener('click', () => { if (!suppressClick) turn(1); });
-    $('#zMid').addEventListener('click', () => { if (suppressClick) return; hideHint(); setControls(!controlsOn); });
-    // The first-time hint covers the page: a tap on its left or right third does what the page would do.
-    $('#hint').addEventListener('click', (e) => {
-      const x = e.clientX / Math.max(1, window.innerWidth);
-      hideHint();
-      if (x < 1 / 3) turn(-1); else if (x > 2 / 3) turn(1); else setControls(false);
-    });
+    $('#zMid').addEventListener('click', () => { if (!suppressClick) setControls(!controlsOn); });
     $('#coverGo').addEventListener('click', () => {
       if (suppressClick) return;
-      hideHint(); if (controlsOn) setControls(false);
+      if (controlsOn) setControls(false);
       const t = resumeTarget(); if (t) { $('#coverGo').hidden = true; go(pageOfAnchor(t.anchor)); $('#zMid').focus(); }
     });
   }
@@ -606,7 +595,7 @@
         for (const e of ents) {
           if (!e.isIntersecting) continue;
           const b = blocks.find((x) => x.id === e.target.dataset.id); if (!b) continue;
-          if (b.kind !== 'title' && b.kind !== 'cover') { st.anchor[text.id] = { id: b.id, f: 0 }; st.recent = text.id; save(); }
+          if (b.kind !== 'title' && b.kind !== 'cover') { st.anchor[text.id] = { id: b.id, f: 0 }; save(); }
           setPlace(b.kind === 'cover' ? '' : b.kind === 'verse' && b.n ? `${dn(b.n)} / ${dn(text.verses.length)}` : (b.label || text.short));
         }
       }, { root: sc, rootMargin: '-28% 0px -66% 0px', threshold: 0 });
@@ -636,14 +625,14 @@
   function stopRecite() {
     setPlaying(false); reciting = false;
     document.body.classList.remove('reciting');
-    $('#recitebar').hidden = true; $('#reciteNote').hidden = true;
+    $('#recitebar').hidden = true;
     releaseWake();
     relayout(st.anchor[text.id]);
   }
   function setPlaying(on) {
     playing = !!on;
     $('#playBtn').setAttribute('aria-pressed', String(playing));
-    $('#playLbl').textContent = playing ? 'थांबा' : 'सुरू करा';
+    $('#playBtn').setAttribute('aria-label', playing ? 'थांबा' : 'सुरू करा');
     cancelAnimationFrame(rafId);
     if (playing) { lastT = 0; acc = 0; rafId = requestAnimationFrame(step); }
   }
@@ -657,16 +646,13 @@
     rafId = requestAnimationFrame(step);
   }
   async function requestWake() {
-    const note = $('#reciteNote');
     try {
       if ('wakeLock' in navigator) {
         wakeLock = await navigator.wakeLock.request('screen');
         wakeLock.addEventListener('release', () => { wakeLock = null; });
-        note.hidden = true; return;
+        return;
       }
     } catch (e) { /* not allowed or unsupported */ }
-    note.textContent = 'या फोनवर पारायण चालू असताना स्क्रीन आपोआप बंद होऊ शकते.'; note.hidden = false;
-    setTimeout(() => { note.hidden = true; }, 6000);
   }
   function releaseWake() { try { if (wakeLock) wakeLock.release(); } catch (e) { /* ignore */ } wakeLock = null; }
 
@@ -692,8 +678,6 @@
     $('#libBackName').textContent = name; $('#libBackName').setAttribute('lang', text ? text.lang : 'mr');
     $('#libBack').hidden = !text; $('#library .view-foot').hidden = !text; // first visit: nothing to go back to yet
   }
-  function showHint() { if (st.mode === 'page') { $('#hint').hidden = false; setControls(true); } }
-  function hideHint() { if (!$('#hint').hidden) { $('#hint').hidden = true; st.hintSeen = true; save(); } }
   let toastTimer = 0;
   function toast(msg, ms = 2600) {
     const t = $('#toast'); t.textContent = msg; t.classList.add('show');
@@ -708,8 +692,6 @@
     $('#countBtn').setAttribute('aria-label', al); $('#countBtn2').setAttribute('aria-label', al);
     $('#targetVal').textContent = dn(st.target);
     $$('[data-target]').forEach((el) => el.setAttribute('aria-pressed', String(+el.dataset.target === st.target)));
-    $('#countNow').textContent = text ? `${text.short}: आतापर्यंत ${dn(c)} वेळा पूर्ण` : '';
-    $('#countNow').setAttribute('lang', 'mr');
     $('#countSec').hidden = !text;
     if (!resetArm) $('#countReset').textContent = resetLabel();
   }
@@ -733,7 +715,7 @@
     return textual(b) ? b : null;
   }
   function prepareShare() {
-    const b = shareBlock(); if (!b) return;
+    const b = shareBlock(); $('#shareBtn').disabled = !b; if (!b) return;
     const key = text.id + ':' + b.id;
     if (shareCache && shareCache.key === key) return;
     const entry = { key, file: null }; shareCache = entry;
@@ -746,7 +728,7 @@
   }
   async function onShare() {
     const b = shareBlock();
-    if (!b) { toast(`पाठवण्यासाठी आधी पान उलटून ${unit(entry, 'at')} या`); return; }
+    if (!b) return;
     const key = text.id + ':' + b.id;
     const ready = shareCache && shareCache.key === key ? shareCache.file : null;
     const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; } };
@@ -862,10 +844,9 @@
   }
 
   /* contents page: one list per kind (स्तोत्रे, then आरत्या once one is live). Each row: the deity's
-     emblem, the title, one quiet line (subtitle · author · language) and a progress ring. */
+     emblem, the title and a progress ring. */
   const KIND_HEAD = { stotra: 'स्तोत्रे', aarti: 'आरत्या' };
   const GROUP_AT = 8; // from this many texts in one list, deity headings appear between them
-  const langName = (id) => (catalog.languages.find((l) => l.id === id) || { name: id }).name;
   function ringSVG(p) {
     if (!p) return '';
     const R = 15, C = 2 * Math.PI * R, frac = p.done ? 1 : Math.max(0.05, p.n / Math.max(1, p.total));
@@ -883,11 +864,10 @@
     const p = progressOf(t.id, t.verses);
     const g = groupOf(t.deity) || {};
     const art = (g.cover && coverSVG[g.cover]) || '';
-    const meta = [t.subtitle, t.author, langName(t.lang)].filter(Boolean).join(' · ');
     const sr = [now ? 'आता उघडे' : '', progressWords(t, p)].filter(Boolean).join(' · ');
     return `<li><button type="button" class="trow" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
       + `<span class="mark" aria-hidden="true">${art}</span>`
-      + `<span class="trow-text"><span class="trow-title" lang="${esc(t.lang)}">${esc(t.title)}</span><span class="trow-meta">${esc(meta)}</span></span>`
+      + `<span class="trow-text"><span class="trow-title" lang="${esc(t.lang)}">${esc(t.title)}</span></span>`
       + ringSVG(p) + (sr ? `<span class="sr"> · ${esc(sr)}</span>` : '') + '</button></li>';
   }
   function renderLibrary() {
@@ -949,7 +929,7 @@
 
   /* ------------------------------------------------------------- japa, reminders */
   let resetArm = false, resetTimer = 0;
-  const resetLabel = () => `${unit(entry, 'gen')} मोजणी शून्य करा`;
+  const resetLabel = () => 'शून्य करा';
   function gcalUrl(kind) {
     const now = new Date(), d = new Date(now), pad = (n) => String(n).padStart(2, '0');
     if (kind === 'bh') { d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7)); d.setHours(7, 0, 0, 0); if (d <= now) d.setDate(d.getDate() + 7); }
@@ -1048,14 +1028,13 @@
     if (reciting) { setPlaying(false); reciting = false; document.body.classList.remove('reciting'); $('#recitebar').hidden = true; releaseWake(); }
     await loadCoverArt(e);
     text = t; entry = e; st.text = id; save();
-    blocks = buildBlocks(t); pages = []; shareCache = null; edgeToastShown = false;
+    blocks = buildBlocks(t); pages = []; shareCache = null;
     $('#welcome').hidden = true;
     document.title = `${t.short} · माझी स्तोत्रे`;
     setLocName();
     updateCount();
     // from the list: start at the cover (it offers "continue"); on app start: back to the saved place
     await relayout(opts && opts.cover ? { id: 'cover', f: 0 } : (st.anchor[id] || null));
-    if (!st.hintSeen && st.mode === 'page') showHint();
   }
   /** A row in the contents page: the text you are reading takes you back to your page; another text opens at its cover. */
   function pick(id) {
@@ -1081,7 +1060,6 @@
     $('#countBtn2').addEventListener('click', bump);
     $('#shareBtn').addEventListener('click', onShare);
     document.addEventListener('keydown', (e) => {
-      if (!$('#hint').hidden) { hideHint(); if (e.key === 'Escape' || e.key === ' ') { e.preventDefault(); return; } }
       if (overlayOpen()) { if (e.key === 'Escape') { e.preventDefault(); closeTopOverlay(); } else if (e.key === 'Tab') trapFocus(e); return; }
       if (reciting) { if (e.key === 'Escape') stopRecite(); return; }
       const onControl = e.target && e.target.closest && e.target.closest('button, input, a, summary');
@@ -1121,7 +1099,6 @@
     }
     catch (e) {
       $('#welcome').hidden = false;
-      $('.welcome-sub').textContent = 'पहिल्यांदा उघडण्यासाठी इंटरनेट लागते. इंटरनेट सुरू करून पुन्हा उघडा.';
       return;
     }
     bindUI();
