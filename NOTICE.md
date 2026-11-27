@@ -16,9 +16,13 @@ AI-generated drafts, not yet reviewed by a person. No copyright is claimed; dedi
 CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Once a human reviewer rewrites them, relicense them
 under CC BY-SA 4.0 in the reviewer's name.
 
-## Cover art (covers/*.svg)
-Original drawings made for this app from plain geometry (bow and arrow for Shri Ram; mace before the rising sun for
-Maruti). No image was traced or copied, and no deity figure is drawn. Dedicated to the public domain under CC0 1.0.
+## Illustrations (art/)
+Original paintings made for this app: the Chandrabhaga ghats at Pandharpur, Sajjangad, a Deccan Maruti temple of the
+kind Samarth Ramdas established, the Shri Vitthal Rukmini temple, and the Pandharpur Wari. They are original
+AI-generated art. They show places and a procession at a distance, not close-up images of deities. No photograph
+was copied into these files. Thumbnails in `art/thumbs/` are the same paintings, smaller, for narrow screens.
+`art/chandrabhaga-ghats-sunrise-800.webp` is the same ghats painting at 800 pixels wide, for the library hero
+on a phone.
 
 ## Interface icons (inline SVG symbols in index.html)
 Original drawings made for this app on a 24-unit grid from plain lines and circles (list, mala, bell, info, send,

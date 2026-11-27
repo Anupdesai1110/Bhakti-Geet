@@ -99,7 +99,12 @@
 <!-- contents page: every text, then the three quiet links -->
 <section class="view" id="library" role="dialog" aria-modal="true" aria-labelledby="libTitle" hidden>
   <div class="view-body">
-    <h1 class="view-title" id="libTitle" tabindex="-1">माझी स्तोत्रे</h1>
+    <header class="hero">
+      <div class="hero-frame">
+        <img src="art/chandrabhaga-ghats-sunrise.webp" srcset="art/thumbs/chandrabhaga-ghats-sunrise.webp 400w, art/chandrabhaga-ghats-sunrise-800.webp 800w, art/chandrabhaga-ghats-sunrise.webp 1200w" sizes="(min-width: 720px) 600px, calc(100vw - 40px)" width="1200" height="1600" alt="पंढरपूरच्या चंद्रभागा घाटावर सूर्योदय: नदीपात्रातील पुंडलिक मंदिर व साथीची देउळे, काळ्या कातळाच्या पायऱ्या, लाकडी होडी आणि दिवे." decoding="async">
+      </div>
+      <h1 class="view-title" id="libTitle" tabindex="-1">माझी स्तोत्रे</h1>
+    </header>
     <div id="shelf"></div>
     <ul class="links">
       <li><button type="button" class="link" data-open="japa"><svg class="ico" aria-hidden="true"><use href="#i-mala"/></svg><span>जप</span><svg class="ico go" aria-hidden="true"><use href="#i-go"/></svg></button></li>
@@ -160,6 +165,10 @@
 <section class="view sub" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
   <div class="view-body">
     <h2 class="view-title" id="aboutTitle" tabindex="-1">माहिती व श्रेय</h2>
+    <div class="about-art">
+      <img src="art/vitthal-temple-pandharpur.webp" srcset="art/thumbs/vitthal-temple-pandharpur.webp 400w, art/vitthal-temple-pandharpur.webp 1200w" sizes="(min-width: 720px) 280px, 46vw" width="1200" height="1600" alt="पंढरपूरचे श्री विठ्ठल-रुक्मिणी मंदिर: काळ्या कातळाच्या तटभिंती, नामदेव द्वार आणि पायऱ्या चढणारे भाविक, आणि मंदिराचे कोरीव शिखर." decoding="async" loading="lazy">
+      <img class="wari" src="art/wari-procession.webp" srcset="art/thumbs/wari-procession.webp 400w, art/wari-procession.webp 1200w" sizes="(min-width: 720px) 280px, 46vw" width="1200" height="1600" alt="पंढरपूरच्या वारीत मागून दिसणारे वारकरी: पांढरी वेशभूषा व गांधी टोपी, भगवे झेंडे, डोक्यावर वाहणार्‍या महिला, आणि बैलांच्या रथातील पालखी." decoding="async" loading="lazy">
+    </div>
     <div id="credits" class="credits"></div>
   </div>
   <div class="view-foot"><button type="button" class="backbtn" data-back><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg><span class="sr">परत: माझी स्तोत्रे</span></button></div>

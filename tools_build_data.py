@@ -6,7 +6,7 @@ Run from anywhere:  python3 tools_build_data.py
   3. writes the calendar reminder files in reminders/ (RFC 5545, CRLF, folded lines),
   4. writes the precache list and a content-hash VERSION into sw.js
      (index.html, app.js, style.css, manifest, the catalog and the data/cover files of texts with "live": true,
-      covers/titles.json, fonts/*.woff2|txt, icons/*.png, reminders/*.ics).
+      covers/titles.json, art/**/*.webp, fonts/*.woff2|txt, icons/*.png, reminders/*.ics).
 
 The data files are the source of truth. The v1 prototype parsed raw Wikisource dumps (raw/),
 which were not in the bundle; to re-check against Wikisource, fetch the pinned revisions:
@@ -37,8 +37,21 @@ for e in catalog['texts']:
     g = next((g for g in catalog['groups'] if g['id'] == e.get('deity')), None)
     if not g or g.get('kind') != 'deity': fail(f"{e['id']}: 'deity' must name a deity group (it picks the cover art)")
     if not g.get('cover') or not os.path.isfile(rel(g['cover'])): fail(f"{e['id']}: cover art {g.get('cover')} missing")
-    svg = open(rel(g['cover']), encoding='utf-8').read().lstrip()
-    if not svg.startswith('<svg') or '<script' in svg or 'href=' in svg: fail(f"{g['cover']}: must be a plain inline SVG (no scripts, no links)")
+    cover_path = g['cover']
+    if cover_path.lower().endswith('.svg'):
+        svg = open(rel(cover_path), encoding='utf-8').read().lstrip()
+        if not svg.startswith('<svg') or '<script' in svg or 'href=' in svg: fail(f"{cover_path}: must be a plain inline SVG (no scripts, no links)")
+    elif cover_path.lower().endswith('.webp'):
+        blob = open(rel(cover_path), 'rb').read(12)
+        if blob[:4] != b'RIFF' or blob[8:12] != b'WEBP': fail(f"{cover_path}: not a WebP")
+        if not str(g.get('cover_label', '')).strip(): fail(f"{e['id']}: an image cover needs cover_label (alt text)")
+        if not isinstance(g.get('cover_w'), int) or not isinstance(g.get('cover_h'), int): fail(f"{e['id']}: an image cover needs integer cover_w and cover_h")
+        thumb = g.get('cover_thumb')
+        if not thumb or not os.path.isfile(rel(thumb)): fail(f"{e['id']}: cover thumbnail {thumb} missing")
+        tblob = open(rel(thumb), 'rb').read(12)
+        if tblob[:4] != b'RIFF' or tblob[8:12] != b'WEBP': fail(f"{thumb}: not a WebP")
+    else:
+        fail(f"{cover_path}: cover must be an SVG or a WebP")
     if not e.get('cover_lines') or not all(l.strip() for l in e['cover_lines']): fail(f"{e['id']}: cover_lines missing")
     for l in e['cover_lines']:
         if f"{l}|{e['lang']}" not in title_lines:
@@ -134,9 +147,25 @@ with open(rel('reminders', 'bhimrupi-saturday-0700.ics'), 'w', encoding='utf-8',
 runtime = ['index.html', 'app.js', 'style.css', 'manifest.webmanifest']
 live = [e for e in catalog['texts'] if e.get('live', True)]
 staged = [e['id'] for e in catalog['texts'] if not e.get('live', True)]
-used = {'data/catalog.json', 'covers/titles.json'} | {e['file'] for e in live} | {g['cover'] for g in catalog['groups'] if any(e.get('deity') == g['id'] for e in live)}
+used = {'data/catalog.json', 'covers/titles.json'} | {e['file'] for e in live}
+for g in catalog['groups']:
+    if any(e.get('deity') == g['id'] for e in live):
+        used.add(g['cover'])
+        if g.get('cover_thumb'): used.add(g['cover_thumb'])
 for sub, pat in [('data', r'\.json$'), ('covers', r'\.(svg|json)$'), ('fonts', r'\.(woff2|txt)$'), ('icons', r'\.png$'), ('reminders', r'\.ics$')]:
     runtime += sorted(f'{sub}/{n}' for n in os.listdir(rel(sub)) if re.search(pat, n) and (sub not in ('data', 'covers') or f'{sub}/{n}' in used))
+art_files = []
+for dirpath, _, files in os.walk(rel('art')):
+    for n in files:
+        if n.lower().endswith('.webp'):
+            art_files.append(os.path.relpath(os.path.join(dirpath, n), ROOT).replace(os.sep, '/'))
+runtime += sorted(art_files)
+page = open(rel('index.html'), encoding='utf-8').read()
+for attr in re.findall(r'(?:src|srcset)="([^"]+)"', page):
+    for part in attr.split(','):
+        url = part.strip().split(' ')[0]
+        if url.startswith('art/') and not os.path.isfile(rel(url)): fail(f'index.html references missing {url}')
+        if url.startswith('art/') and url not in runtime: fail(f'{url} is referenced but not precached')
 h = hashlib.sha256()
 for p in runtime:
     h.update(p.encode()); h.update(open(rel(p), 'rb').read())

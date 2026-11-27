@@ -130,6 +130,13 @@ html[data-theme="sepia"] .reader, html[data-theme="sepia"] .page { background: v
 }
 .cover-art { flex: 0 1 auto; width: var(--cart, 240px); height: var(--cart, 240px); min-width: 64px; min-height: 64px; }
 .cover-art svg { display: block; width: 100%; height: 100%; }
+/* a painting is 3:4; --cart is its width, and the height follows so the fitter can measure it */
+.cover-art.painting { height: auto; min-height: 0; aspect-ratio: 3 / 4; flex: 0 0 auto; }
+.cover-art.painting img {
+  display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 18px;
+  background: var(--chip); box-shadow: var(--shadow);
+}
+.pbody.cover.row .cover-art.painting { align-self: center; }
 .cover-text { display: flex; flex-direction: column; align-items: center; gap: calc(var(--cgap, 12px) * .6); min-width: 0; max-width: 100%; }
 .cover-shri { margin: 0; font-family: var(--serif); font-size: var(--csub, 20px); line-height: 1.4; color: var(--accent); }
 .cover-title { margin: 0; font-family: var(--display); font-weight: 400; font-size: var(--ctitle, 44px); line-height: 1.32; color: var(--ink); }
@@ -242,6 +249,30 @@ body.reciting #rail { visibility: hidden; }
 .backbtn .ico { color: var(--accent); }
 .backbtn span:last-child { font-family: var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* library hero: the picture fades into the page colour; the title sits below it, on the page, never on the paint */
+.hero { margin: 0 0 4px; }
+.hero-frame { position: relative; }
+.hero img {
+  display: block; width: 100%; height: 210px; object-fit: cover; object-position: center 40%;
+  border-radius: 18px; background: var(--chip);
+}
+.hero-frame::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 52px; border-radius: 0 0 18px 18px;
+  background: linear-gradient(to top, var(--bg), transparent); pointer-events: none;
+}
+.hero .view-title { margin: 14px 0 8px; }
+@media (min-width: 720px) { .hero img { height: 248px; } }
+@media (max-height: 520px) { .hero img { height: 120px; } .hero .view-title { margin-top: 8px; } }
+
+/* about: two quiet plates under the title, not a gallery */
+.about-art { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 6px 0 4px; }
+.about-art img {
+  display: block; width: 100%; height: 168px; object-fit: cover; object-position: center 32%;
+  border-radius: 16px; background: var(--chip);
+}
+.about-art img.wari { object-position: center 58%; }
+@media (min-width: 720px) { .about-art img { height: 220px; } }
+
 /* contents: lists of texts */
 .shelf { margin-top: 10px; }
 .shelf-head { margin: 22px 0 2px; font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--ink2); }
@@ -254,8 +285,8 @@ body.reciting #rail { visibility: hidden; }
 }
 /* the text you are reading: a ribbon, like a bookmark left in a पोथी */
 .trow[aria-current="true"]::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 2px; background: var(--accent); }
-.mark { flex: none; width: 54px; height: 54px; }
-.mark svg { display: block; width: 100%; height: 100%; }
+.mark { flex: none; width: 46px; height: 62px; border-radius: 8px; overflow: hidden; background: var(--chip); }
+.mark svg, .mark img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
 .mark .e-soft { display: none; }
 .trow-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .trow-title { font-family: var(--serif); font-size: 23px; line-height: 1.45; }
@@ -389,6 +420,7 @@ html[data-motion="off"] .view.open, html[data-motion="off"] .sheet.open .sheet-p
 @media (forced-colors: active) {
   .swatch[aria-pressed="true"] .chip-a, .mode[aria-pressed="true"], .chip[aria-pressed="true"] { outline: 3px solid Highlight; }
   .trow[aria-current="true"]::before { background: Highlight; }
+  .hero-frame::after { display: none; }
 }
 
 .rail button:disabled { opacity: .35; }
