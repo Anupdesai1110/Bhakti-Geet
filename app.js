@@ -353,14 +353,33 @@
     const [x0, x1, y0, y1, d] = t, w = x1 - x0, h = y1 - y0; // font units, 1000 per em; the box holds all the ink
     return `<svg class="ln" viewBox="${x0} ${y0} ${w} ${h}" width="${(w / 1000).toFixed(3)}em" height="${(h / 1000).toFixed(3)}em" aria-hidden="true" focusable="false"><path d="${d}"/></svg>`;
   }
+  const isSvgCover = (g) => !!(g && g.cover && /\.svg$/i.test(g.cover));
   async function loadCoverArt(e) {
     await loadTitles();
     const g = groupOf(e && e.deity); const path = g && g.cover;
     if (!path || coverSVG[path] !== undefined) return;
+    if (!isSvgCover(g)) { coverSVG[path] = ''; return; } // a painting: the <img> loads it; the service worker has it cached
     try {
       const r = await fetch(path); const svg = await r.text();
       coverSVG[path] = r.ok && /^<svg[\s>]/.test(svg.trim()) ? svg.trim() : '';
     } catch (err) { coverSVG[path] = ''; } // offline before first cache: the cover shows text only
+  }
+  /** Cover plate: an inline SVG emblem, or a painting with its thumbnail for narrow screens. */
+  function coverArtHTML(g) {
+    if (!g || !g.cover) return '';
+    if (isSvgCover(g)) {
+      const svg = coverSVG[g.cover] || '';
+      return svg ? `<div class="cover-art" role="img" aria-label="${esc(g.cover_label || g.name || '')}">${svg}</div>` : '';
+    }
+    const full = g.cover, thumb = g.cover_thumb || full, w = g.cover_w || 1200, h = g.cover_h || 1600;
+    const set = thumb === full ? '' : ` srcset="${esc(thumb)} 400w, ${esc(full)} ${w}w"`;
+    return `<div class="cover-art painting"><img src="${esc(full)}"${set} sizes="(min-width: 900px) 300px, 68vw" width="${w}" height="${h}" alt="${esc(g.cover_label || g.name || '')}" decoding="async"></div>`;
+  }
+  function markHTML(g) {
+    if (!g || !g.cover) return '';
+    if (isSvgCover(g)) return coverSVG[g.cover] || '';
+    const src = g.cover_thumb || g.cover;
+    return `<img src="${esc(src)}" alt="" width="400" height="533" decoding="async" loading="lazy">`;
   }
   /** Where "continue" should go for a text, or null (nothing read yet, or already finished). */
   function progressOf(id, total) {
@@ -383,10 +402,10 @@
   function coverHTML(inScroll) {
     const e = entry || {}; const g = groupOf(e.deity) || {};
     const lines = e.cover_lines && e.cover_lines.length ? e.cover_lines : [text.title];
-    const art = (g.cover && coverSVG[g.cover]) || '';
+    const art = coverArtHTML(g);
     const slot = !inScroll && resumeTarget() ? '<span class="cover-slot" aria-hidden="true"></span>' : '';
     return `<div class="pbody cover${coverRow && !inScroll ? ' row' : ''}" data-id="cover">`
-      + (art ? `<div class="cover-art" role="img" aria-label="${esc(g.cover_label || g.name || '')}">${art}</div>` : '')
+      + art
       + '<div class="cover-text">' + (coverTrim < 1 || inScroll ? '<p class="cover-shri" aria-hidden="true">॥ श्री ॥</p>' : '')
       + `<h1 class="cover-title" lang="${esc(text.lang)}" aria-label="${esc(text.title)}">${lines.map((l) => titleLineHTML(l, text.lang)).join('')}</h1>`
       + (text.subtitle ? `<p class="cover-sub">${esc(text.subtitle)}</p>` : '')
@@ -402,14 +421,20 @@
   function fitCover(g) {
     const meas = $('#measure'), r = document.documentElement.style;
     const W = g.colW, H = g.pageH;
+    const grp = groupOf(entry && entry.deity) || {};
+    // --cart is the art's width. A 3:4 painting is taller than the old square emblem, so the width
+    // budget is the old height budget divided by height/width and the picture stays about as tall.
+    const ratio = isSvgCover(grp) || !grp.cover ? 1 : (grp.cover_h || 4) / (grp.cover_w || 3);
     coverRow = g.W > g.H * 1.2 && g.H < 640;
     const T0 = clamp(Math.round(st.size * 1.3), 34, 72), S0 = clamp(Math.round(st.size * 0.6), 17, 26);
-    const A0 = coverRow ? Math.min(Math.round(H * 0.86), Math.round(W * 0.4), 300) : Math.min(Math.round(W * 0.7), Math.round(H * 0.4), 300);
+    const A0 = coverRow
+      ? Math.min(Math.round(H * 0.88 / ratio), Math.round(W * 0.4), 280)
+      : Math.min(Math.round(W * 0.72), Math.round(H * 0.42 / ratio), 300);
     const G0 = clamp(Math.round(H * 0.02), 6, 16);
     const resume = resumeTarget();
     const apply = (k) => {
       const title = Math.max(24, Math.round(T0 * k)), sub = Math.max(15, Math.round(S0 * Math.max(k, 0.8)));
-      const art = coverRow ? Math.max(64, Math.min(A0, Math.round(H * 0.86))) : Math.max(64, Math.round(A0 * k));
+      const art = coverRow ? Math.max(72, A0) : Math.max(72, Math.round(A0 * k));
       r.setProperty('--ctitle', title + 'px'); r.setProperty('--csub', sub + 'px'); r.setProperty('--cart', art + 'px');
       r.setProperty('--cgap', Math.max(4, Math.round(G0 * k)) + 'px'); r.setProperty('--cbtn', Math.max(17, sub - 1) + 'px'); r.setProperty('--chint', Math.max(15, sub - 3) + 'px');
       return art;
@@ -843,8 +868,8 @@
     else if (!e.shiftKey && (document.activeElement === last || !box.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
   }
 
-  /* contents page: one list per kind (स्तोत्रे, then आरत्या once one is live). Each row: the deity's
-     emblem, the title and a progress ring. */
+  /* contents page: one list per kind (स्तोत्रे, then आरत्या once one is live). Each row: the cover
+     painting, the title and a progress ring. */
   const KIND_HEAD = { stotra: 'स्तोत्रे', aarti: 'आरत्या' };
   const GROUP_AT = 8; // from this many texts in one list, deity headings appear between them
   function ringSVG(p) {
@@ -863,10 +888,9 @@
     const now = text && t.id === text.id;
     const p = progressOf(t.id, t.verses);
     const g = groupOf(t.deity) || {};
-    const art = (g.cover && coverSVG[g.cover]) || '';
     const sr = [now ? 'आता उघडे' : '', progressWords(t, p)].filter(Boolean).join(' · ');
     return `<li><button type="button" class="trow" data-id="${esc(t.id)}"${now ? ' aria-current="true"' : ''}>`
-      + `<span class="mark" aria-hidden="true">${art}</span>`
+      + `<span class="mark" aria-hidden="true">${markHTML(g)}</span>`
       + `<span class="trow-text"><span class="trow-title" lang="${esc(t.lang)}">${esc(t.title)}</span></span>`
       + ringSVG(p) + (sr ? `<span class="sr"> · ${esc(sr)}</span>` : '') + '</button></li>';
   }
@@ -973,7 +997,7 @@
         + `<p>मराठी जाणकाराकडून पाठाची तपासणी: ${t.review && t.review.native_marathi ? esc(t.review.native_marathi) : 'अजून झालेली नाही'}.</p>`
         + (t.corrections.length ? `<details><summary>बदलांची यादी</summary><ol>${t.corrections.map((c) => `<li><span class="dev">${esc(c.where)}</span> ${c.kind === 'added' ? '(जोडले)' : ''}: <span class="dev">${esc(c.from)}</span> → <span class="dev">${esc(c.to)}</span></li>`).join('')}</ol></details>` : '');
     }).join('')
-      + '<h3>मुखपृष्ठावरील चित्रे</h3><p>धनुष्य-बाण, गदा व इतर चिन्हे या ॲपसाठी नव्याने काढलेली मूळ चित्रे आहेत; देवतांची चित्रे मुद्दाम काढलेली नाहीत. कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
+      + '<h3>चित्रे</h3><p>यादीत, मुखपृष्ठावर व माहिती पृष्ठावर दिसणारी चित्रे या ॲपसाठी तयार केलेली मूळ चित्रकृती आहेत. ती कृत्रिम बुद्धिमत्तेने (AI) काढली आहेत. देवतांची जवळची चित्रे मुद्दाम काढलेली नाहीत.</p>'
       + '<h3>बटणांवरील चिन्हे</h3><p>यादी, माळ, घंटा इत्यादी छोटी चिन्हे याच ॲपसाठी साध्या रेषांतून काढलेली मूळ चित्रे आहेत; कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
       + `<h3>मुखपृष्ठावरील नावाची अक्षरे</h3><p>“Gotu” अक्षरशैलीवरून तयार केलेली अक्षरांची रेखाचित्रे — Gotu © 2016 Ek Type, परवाना: ${link('fonts/OFL-Gotu.txt', 'SIL Open Font License 1.1')}. फॉन्टची फाईल ॲपमध्ये नाही; फक्त या नावांची अक्षरे आहेत.</p>`
       + '<h3>मराठी अर्थ</h3><p>अर्थ संगणकाने (AI) लिहिलेला कच्चा <strong>मसुदा</strong> आहे; जाणकारांनी तो अजून तपासलेला नाही, म्हणून तो आपोआप दिसत नाही. यावर कोणताही कॉपीराइट दावा नाही (CC0 1.0).</p>'
@@ -1103,7 +1127,7 @@
     }
     bindUI();
     setLocName();
-    // the contents page shows every text's emblem: fetch the few cover files once (they are precached)
+    // cover titles, and any SVG emblem: paintings are <img> elements and load on their own (they are precached)
     Promise.all(catalog.texts.map(loadCoverArt)).then(() => { if (isOpen('library')) renderLibrary(); });
     if (!st.text || !catalog.texts.some((t) => t.id === st.text)) openOverlay('library'); // first visit: the contents page is the start
     else await openText(st.text);

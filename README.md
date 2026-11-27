@@ -11,7 +11,8 @@ Test: `node tests/smoke.cjs <url>` (needs `playwright-core` and Chrome): walks e
 | `index.html`, `style.css`, `app.js` | the app; icons are inline SVG symbols in `index.html` |
 | `sw.js` | service worker (generated lists) |
 | `data/catalog.json`, `data/<id>.json` | texts and their sources. `"live": false` hides a text |
-| `covers/` | cover art (CC0) and title outlines (Gotu, OFL) |
+| `art/` | painterly illustrations (original AI-generated) and thumbnails; precached |
+| `covers/` | cover title outlines (Gotu, OFL) |
 | `fonts/`, `NOTICE.md` | font + licences, attribution |
 | `reminders/*.ics` | calendar reminder files |
 | `tools_build_data.py` | the build step |

@@ -9,15 +9,21 @@
    "id": "ram",
    "kind": "deity",
    "name": "श्रीराम",
-   "cover": "covers/ram.svg",
-   "cover_label": "श्रीरामांचे धनुष्य-बाण"
+   "cover": "art/sajjangad-rama-precinct.webp",
+   "cover_thumb": "art/thumbs/sajjangad-rama-precinct.webp",
+   "cover_w": 1200,
+   "cover_h": 1600,
+   "cover_label": "सातारा जवळचे सज्जनगड, सूर्यास्ताच्या वेळी: काळ्या कातळाच्या कडा व कमानी दरवाजा, वृक्षाखालील राम-समाधी परिसर, आणि सपाट डेकन डोंगररांगा."
   },
   {
    "id": "hanuman",
    "kind": "deity",
    "name": "मारुती (हनुमान)",
-   "cover": "covers/hanuman.svg",
-   "cover_label": "मारुतीची गदा व उगवता सूर्य"
+   "cover": "art/maruti-mandir-ramdas.webp",
+   "cover_thumb": "art/thumbs/maruti-mandir-ramdas.webp",
+   "cover_w": 1200,
+   "cover_h": 1600,
+   "cover_label": "समर्थ रामदासांनी स्थापन केलेल्या अकरा मारुतींसारखे, डेकन टेकडीवरील छोटे दगडी मारुती मंदिर, भगवा ध्वज, पिंपळ, आणि सपाट डोंगररांगा."
   },
   {
    "id": "ramdas",
